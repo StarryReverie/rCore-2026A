@@ -78,5 +78,41 @@ pub fn rust_main() -> ! {
         fn boot_stack_top(); // stack top
     }
 
-    todo!("ch1 API: implement rust_main")
+    // 1. 未初始化的全局存储先清零，之后才能安全地建立日志等全局状态。
+    clear_bss();
+    logging::init();
+
+    // 2. 输出启动信息（由提供的 SBI 控制台，不依赖宿主标准输出）。
+    println!("[kernel] Hello, world!");
+
+    // 3. 在启动栈上定义局部数组，实际遍历元素求和并输出计算结果。
+    let numbers: [usize; 5] = [1, 2, 3, 4, 5];
+    let mut sum: usize = 0;
+    for number in numbers.iter() {
+        sum += *number;
+    }
+    println!("[kernel] sum = {}", sum);
+
+    // 4. 按原有日志宏、级别、格式与顺序记录内存布局，地址取自链接符号。
+    trace!(
+        "[kernel] .text [{:#x}, {:#x})",
+        stext as usize,
+        etext as usize
+    );
+    debug!(
+        "[kernel] .rodata [{:#x}, {:#x})",
+        srodata as usize, erodata as usize
+    );
+    info!(
+        "[kernel] .data [{:#x}, {:#x})",
+        sdata as usize, edata as usize
+    );
+    warn!(
+        "[kernel] boot_stack top=bottom={:#x}, lower_bound={:#x}",
+        boot_stack_top as usize, boot_stack_lower_bound as usize
+    );
+    error!("[kernel] .bss [{:#x}, {:#x})", sbss as usize, ebss as usize);
+
+    // 5. 通过已提供的 QEMU 退出设备以成功状态结束。
+    crate::board::QEMU_EXIT_HANDLE.exit_success();
 }
