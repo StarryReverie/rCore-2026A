@@ -1,0 +1,18 @@
+# Submit course records with code; keep runtime files and IDE state local.
+course-tools/
+ide/
+!agent-sessions/
+!agent-sessions/**
+!events/
+!events/**
+!submissions/
+!submissions/**
+
+# >>> course-tool records
+!agent-sessions/
+!agent-sessions/**
+!events/
+!events/**
+!submissions/
+!submissions/**
+# <<< course-tool records
