@@ -1,0 +1,234 @@
+The target architecture is set to "riscv:rv64".
+0x0000000000001000 in ?? ()
+
+########## 1. entry: _start ##########
+Temporary breakpoint 1 at 0x8020000c
+
+Temporary breakpoint 1, 0x000000008020000c in stext ()
+pc             0x8020000c	0x8020000c <stext+12>
+sp             0x80219000	0x80219000 <log::STATE>
+=> 0x8020000c <stext+12>:	jalr	-1366(ra)
+   0x80200010 <_ZN4core3str6traits54_$LT$impl$u20$core..cmp..PartialEq$u20$for$u20$str$GT$2eq17hba16fd95cedb309cE>:	addi	sp,sp,-128
+   0x80200012 <_ZN4core3str6traits54_$LT$impl$u20$core..cmp..PartialEq$u20$for$u20$str$GT$2eq17hba16fd95cedb309cE+2>:	sd	ra,120(sp)
+   0x80200014 <_ZN4core3str6traits54_$LT$impl$u20$core..cmp..PartialEq$u20$for$u20$str$GT$2eq17hba16fd95cedb309cE+4>:	sd	s0,112(sp)
+$1 = 0x80209000
+$2 = 0x80219000
+$3 = 65536
+
+########## 2. rust_main ##########
+Temporary breakpoint 2 at 0x80200ac6: file src/main.rs, line 54.
+
+Temporary breakpoint 2, os::rust_main () at src/main.rs:54
+54	    clear_bss();
+Warning: the current language does not match this frame.
+#0  os::rust_main () at src/main.rs:54
+#1  0x0000000080200010 in stext ()
+Backtrace stopped: frame did not save the PC
+pc             0x80200ac6	0x80200ac6 <os::rust_main+20>
+sp             0x80218230	0x80218230
+
+########## 3. clear_bss ##########
+Temporary breakpoint 3 at 0x80200a82: file src/main.rs, line 36.
+
+Temporary breakpoint 3, os::clear_bss () at src/main.rs:36
+36	    (sbss as usize..ebss as usize).for_each(|a| unsafe { (a as *mut u8).write_volatile(0) });
+#0  os::clear_bss () at src/main.rs:36
+#1  0x0000000080200ae0 in os::rust_main () at src/main.rs:54
+#2  0x0000000080200010 in stext ()
+Backtrace stopped: frame did not save the PC
+$4 = 0x80219000
+$5 = 0x8021a000
+$6 = 4096
+0x80219000 <_ZN3log5STATE17h4967594cafa37c36E>:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x80219008 <_ZN3log20MAX_LOG_LEVEL_FILTER17hc97779b554725c07E>:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+
+########## 4. clear_bss closure and sb write ##########
+Temporary breakpoint 4 at 0x802029c0: file src/main.rs, line 36.
+
+Temporary breakpoint 4, os::clear_bss::{closure#0} (a=2149679527) at src/main.rs:36
+36	    (sbss as usize..ebss as usize).for_each(|a| unsafe { (a as *mut u8).write_volatile(0) });
+pc             0x802029c0	0x802029c0 <os::clear_bss::{closure#0}>
+a0             0x802181a7	2149679527
+a1             0x80219000	2149683200
+#0  os::clear_bss::{closure#0} (a=2149679527) at src/main.rs:36
+#1  0x0000000080200860 in core::iter::traits::iterator::Iterator::for_each::call::{closure#0}<usize, os::clear_bss::{closure_env#0}> (item=2149683200) at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/iter/traits/iterator.rs:815
+#2  0x0000000080202d74 in core::iter::traits::iterator::Iterator::fold<core::ops::range::Range<usize>, (), core::iter::traits::iterator::Iterator::for_each::call::{closure_env#0}<usize, os::clear_bss::{closure_env#0}>> (self=..., init=0, f=...) at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/iter/traits/iterator.rs:2589
+#3  0x0000000080202d96 in core::iter::traits::iterator::Iterator::for_each<core::ops::range::Range<usize>, os::clear_bss::{closure_env#0}> (self=..., f=...) at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/iter/traits/iterator.rs:818
+#4  0x0000000080200aaa in os::clear_bss () at src/main.rs:36
+#5  0x0000000080200ae0 in os::rust_main () at src/main.rs:54
+#6  0x0000000080200010 in stext ()
+Backtrace stopped: frame did not save the PC
+=> 0x802029c0 <_ZN2os9clear_bss28_$u7b$$u7b$closure$u7d$$u7d$17h8dbc4b28ff0a6f15E>:	addi	sp,sp,-64
+   0x802029c2 <_ZN2os9clear_bss28_$u7b$$u7b$closure$u7d$$u7d$17h8dbc4b28ff0a6f15E+2>:	sd	ra,56(sp)
+   0x802029c4 <_ZN2os9clear_bss28_$u7b$$u7b$closure$u7d$$u7d$17h8dbc4b28ff0a6f15E+4>:	sd	s0,48(sp)
+   0x802029c6 <_ZN2os9clear_bss28_$u7b$$u7b$closure$u7d$$u7d$17h8dbc4b28ff0a6f15E+6>:	addi	s0,sp,64
+   0x802029c8 <_ZN2os9clear_bss28_$u7b$$u7b$closure$u7d$$u7d$17h8dbc4b28ff0a6f15E+8>:	sd	a1,-64(s0)
+   0x802029cc <_ZN2os9clear_bss28_$u7b$$u7b$closure$u7d$$u7d$17h8dbc4b28ff0a6f15E+12>:	mv	a1,a0
+   0x802029ce <_ZN2os9clear_bss28_$u7b$$u7b$closure$u7d$$u7d$17h8dbc4b28ff0a6f15E+14>:	ld	a0,-64(s0)
+   0x802029d2 <_ZN2os9clear_bss28_$u7b$$u7b$closure$u7d$$u7d$17h8dbc4b28ff0a6f15E+18>:	sd	a1,-48(s0)
+   0x802029d6 <_ZN2os9clear_bss28_$u7b$$u7b$closure$u7d$$u7d$17h8dbc4b28ff0a6f15E+22>:	sd	a0,-40(s0)
+   0x802029da <_ZN2os9clear_bss28_$u7b$$u7b$closure$u7d$$u7d$17h8dbc4b28ff0a6f15E+26>:	sd	a0,-32(s0)
+Temporary breakpoint 5 at 0x802029fa: file /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/ptr/mod.rs, line 1757.
+
+Temporary breakpoint 5, core::ptr::write_volatile<u8> (dst=<optimized out>, src=<optimized out>) at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/ptr/mod.rs:1757
+warning: 1757	/rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/ptr/mod.rs: No such file or directory
+pc             0x802029fa	0x802029fa <os::clear_bss::{closure#0}+58>
+a0             0x0	0
+a1             0x80219000	2149683200
+=> 0x802029fa <_ZN2os9clear_bss28_$u7b$$u7b$closure$u7d$$u7d$17h8dbc4b28ff0a6f15E+58>:	sb	a0,0(a1)
+0x00000000802029fe	1757	in /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/ptr/mod.rs
+0x80219000 <_ZN3log5STATE17h4967594cafa37c36E>:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+
+########## 5. logging::init ##########
+Temporary breakpoint 6 at 0x80203166: file src/logging.rs, line 36.
+
+Temporary breakpoint 6, os::logging::init () at src/logging.rs:36
+36	    log::set_logger(&LOGGER).unwrap();
+#0  os::logging::init () at src/logging.rs:36
+#1  0x0000000080200ae8 in os::rust_main () at src/main.rs:55
+#2  0x0000000080200010 in stext ()
+Backtrace stopped: frame did not save the PC
+0x80219000 <_ZN3log5STATE17h4967594cafa37c36E>:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+0x80219008 <_ZN3log20MAX_LOG_LEVEL_FILTER17hc97779b554725c07E>:	0x00	0x00	0x00	0x00	0x00	0x00	0x00	0x00
+
+########## 6. console::print ##########
+Temporary breakpoint 7 at 0x80201c8c: file src/console.rs, line 17.
+
+Temporary breakpoint 7, os::console::print (args=...) at src/console.rs:17
+17	    Stdout.write_fmt(args).unwrap();
+#0  os::console::print (args=...) at src/console.rs:17
+#1  0x0000000080200b1e in os::rust_main () at src/console.rs:32
+#2  0x0000000080200010 in stext ()
+Backtrace stopped: frame did not save the PC
+=> 0x80201c8c <_ZN2os7console5print17h8b83368d3fdcc26fE+8>:	ld	a1,40(a0)
+   0x80201c8e <_ZN2os7console5print17h8b83368d3fdcc26fE+10>:	sd	a1,-32(s0)
+   0x80201c92 <_ZN2os7console5print17h8b83368d3fdcc26fE+14>:	ld	a1,32(a0)
+   0x80201c94 <_ZN2os7console5print17h8b83368d3fdcc26fE+16>:	sd	a1,-40(s0)
+   0x80201c98 <_ZN2os7console5print17h8b83368d3fdcc26fE+20>:	ld	a1,24(a0)
+   0x80201c9a <_ZN2os7console5print17h8b83368d3fdcc26fE+22>:	sd	a1,-48(s0)
+   0x80201c9e <_ZN2os7console5print17h8b83368d3fdcc26fE+26>:	ld	a1,16(a0)
+   0x80201ca0 <_ZN2os7console5print17h8b83368d3fdcc26fE+28>:	sd	a1,-56(s0)
+   0x80201ca4 <_ZN2os7console5print17h8b83368d3fdcc26fE+32>:	ld	a1,8(a0)
+   0x80201ca6 <_ZN2os7console5print17h8b83368d3fdcc26fE+34>:	sd	a1,-64(s0)
+
+########## 7. console_putchar and ecall ##########
+Temporary breakpoint 8 at 0x80201dac: file src/sbi.rs, line 26.
+
+Temporary breakpoint 8, os::sbi::console_putchar (c=91) at src/sbi.rs:26
+26	    sbi_call(SBI_CONSOLE_PUTCHAR, c, 0, 0);
+c = 91
+$7 = 0x5b
+#0  os::sbi::console_putchar (c=91) at src/sbi.rs:26
+#1  0x0000000080201c82 in os::console::{impl#0}::write_str (self=0x802181e7, s=...) at src/console.rs:10
+#2  0x000000008020455e in core::fmt::write () at library/core/src/fmt/mod.rs:1182
+#3  0x0000000080201bea in core::fmt::Write::write_fmt::{impl#1}::spec_write_fmt<os::console::Stdout> (self=0x802181e7, args=...) at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/fmt/mod.rs:218
+#4  0x0000000080201b4e in core::fmt::Write::write_fmt<os::console::Stdout> (self=0x802181e7, args=<error reading variable: Cannot access memory at address 0x110020>) at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/fmt/mod.rs:223
+#5  0x0000000080201cc0 in os::console::print (args=...) at src/console.rs:17
+#6  0x0000000080200b1e in os::rust_main () at src/console.rs:32
+#7  0x0000000080200010 in stext ()
+Backtrace stopped: frame did not save the PC
+Dump of assembler code from 0x80201d8c to 0x80201dc0:
+   0x0000000080201d8c <_ZN2os3sbi15console_putchar17h413d1de33f701962E+0>:	7139              	addi	sp,sp,-64
+   0x0000000080201d8e <_ZN2os3sbi15console_putchar17h413d1de33f701962E+2>:	fc06              	sd	ra,56(sp)
+   0x0000000080201d90 <_ZN2os3sbi15console_putchar17h413d1de33f701962E+4>:	f822              	sd	s0,48(sp)
+   0x0000000080201d92 <_ZN2os3sbi15console_putchar17h413d1de33f701962E+6>:	0080              	addi	s0,sp,64
+   0x0000000080201d94 <_ZN2os3sbi15console_putchar17h413d1de33f701962E+8>:	fca43023        	sd	a0,-64(s0)
+   0x0000000080201d98 <_ZN2os3sbi15console_putchar17h413d1de33f701962E+12>:	4885              	li	a7,1
+   0x0000000080201d9a <_ZN2os3sbi15console_putchar17h413d1de33f701962E+14>:	fd143823        	sd	a7,-48(s0)
+   0x0000000080201d9e <_ZN2os3sbi15console_putchar17h413d1de33f701962E+18>:	fca43c23        	sd	a0,-40(s0)
+   0x0000000080201da2 <_ZN2os3sbi15console_putchar17h413d1de33f701962E+22>:	4801              	li	a6,0
+   0x0000000080201da4 <_ZN2os3sbi15console_putchar17h413d1de33f701962E+24>:	ff043023        	sd	a6,-32(s0)
+   0x0000000080201da8 <_ZN2os3sbi15console_putchar17h413d1de33f701962E+28>:	ff043423        	sd	a6,-24(s0)
+=> 0x0000000080201dac <_ZN2os3sbi15console_putchar17h413d1de33f701962E+32>:	85c2              	mv	a1,a6
+   0x0000000080201dae <_ZN2os3sbi15console_putchar17h413d1de33f701962E+34>:	8642              	mv	a2,a6
+   0x0000000080201db0 <_ZN2os3sbi15console_putchar17h413d1de33f701962E+36>:	00000073        	ecall
+   0x0000000080201db4 <_ZN2os3sbi15console_putchar17h413d1de33f701962E+40>:	fca43423        	sd	a0,-56(s0)
+   0x0000000080201db8 <_ZN2os3sbi15console_putchar17h413d1de33f701962E+44>:	70e2              	ld	ra,56(sp)
+   0x0000000080201dba <_ZN2os3sbi15console_putchar17h413d1de33f701962E+46>:	7442              	ld	s0,48(sp)
+   0x0000000080201dbc <_ZN2os3sbi15console_putchar17h413d1de33f701962E+48>:	6121              	addi	sp,sp,64
+   0x0000000080201dbe <_ZN2os3sbi15console_putchar17h413d1de33f701962E+50>:	8082              	ret
+End of assembler dump.
+Temporary breakpoint 9 at 0x80201db0: file src/sbi.rs, line 12.
+
+Temporary breakpoint 9, 0x0000000080201db0 in os::sbi::sbi_call (which=1, arg0=91, arg1=0, arg2=0) at src/sbi.rs:12
+12	        asm!(
+=> 0x80201db0 <_ZN2os3sbi15console_putchar17h413d1de33f701962E+36>:	ecall
+a0             0x5b	91
+a1             0x0	0
+a2             0x0	0
+a6             0x0	0
+a7             0x1	1
+
+########## 8. exit_success -> exit -> MMIO sw ##########
+Temporary breakpoint 10 at 0x802026d8: file src/boards/qemu.rs, line 68.
+
+Temporary breakpoint 10, os::board::{impl#1}::exit_success (self=0x0) at src/boards/qemu.rs:68
+68	    fn exit_success(&self) -> ! {
+#0  os::board::{impl#1}::exit_success (self=0x0) at src/boards/qemu.rs:68
+#1  0x00000000802016ea in os::rust_main () at src/main.rs:77
+#2  0x0000000080200010 in stext ()
+Backtrace stopped: frame did not save the PC
+Dump of assembler code from 0x80202658 to 0x802026d8:
+   0x0000000080202658 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+0>:	7139              	addi	sp,sp,-64
+   0x000000008020265a <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+2>:	fc06              	sd	ra,56(sp)
+   0x000000008020265c <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+4>:	f822              	sd	s0,48(sp)
+   0x000000008020265e <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+6>:	0080              	addi	s0,sp,64
+   0x0000000080202660 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+8>:	862a              	mv	a2,a0
+   0x0000000080202662 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+10>:	fcc43423        	sd	a2,-56(s0)
+   0x0000000080202666 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+14>:	0005851b        	sext.w	a0,a1
+   0x000000008020266a <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+18>:	86ae              	mv	a3,a1
+   0x000000008020266c <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+20>:	fcd43823        	sd	a3,-48(s0)
+   0x0000000080202670 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+24>:	fec43023        	sd	a2,-32(s0)
+   0x0000000080202674 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+28>:	feb42623        	sw	a1,-20(s0)
+   0x0000000080202678 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+32>:	6595              	lui	a1,0x5
+   0x000000008020267a <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+34>:	5555859b        	addiw	a1,a1,1365 # 0x5555
+   0x000000008020267e <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+38>:	02b50e63        	beq	a0,a1,0x802026ba <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+98>
+   0x0000000080202682 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+42>:	a009              	j	0x80202684 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+44>
+   0x0000000080202684 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+44>:	fd043503        	ld	a0,-48(s0)
+   0x0000000080202688 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+48>:	2501              	sext.w	a0,a0
+   0x000000008020268a <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+50>:	659d              	lui	a1,0x7
+   0x000000008020268c <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+52>:	7775859b        	addiw	a1,a1,1911 # 0x7777
+   0x0000000080202690 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+56>:	02b50563        	beq	a0,a1,0x802026ba <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+98>
+   0x0000000080202694 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+60>:	a009              	j	0x80202696 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+62>
+   0x0000000080202696 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+62>:	fd043503        	ld	a0,-48(s0)
+   0x000000008020269a <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+66>:	2501              	sext.w	a0,a0
+   0x000000008020269c <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+68>:	65cd              	lui	a1,0x13
+   0x000000008020269e <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+70>:	3335859b        	addiw	a1,a1,819 # 0x13333
+   0x00000000802026a2 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+74>:	00b50c63        	beq	a0,a1,0x802026ba <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+98>
+   0x00000000802026a6 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+78>:	a009              	j	0x802026a8 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+80>
+   0x00000000802026a8 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+80>:	fd043503        	ld	a0,-48(s0)
+   0x00000000802026ac <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+84>:	00000097        	auipc	ra,0x0
+   0x00000000802026b0 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+88>:	f8c080e7        	jalr	-116(ra) # 0x80202638 <_ZN2os5board16exit_code_encode17h6b737684619c038eE>
+   0x00000000802026b4 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+92>:	fca42e23        	sw	a0,-36(s0)
+   0x00000000802026b8 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+96>:	a031              	j	0x802026c4 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+108>
+   0x00000000802026ba <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+98>:	fd043503        	ld	a0,-48(s0)
+   0x00000000802026be <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+102>:	fca42e23        	sw	a0,-36(s0)
+   0x00000000802026c2 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+106>:	a009              	j	0x802026c4 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+108>
+   0x00000000802026c4 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+108>:	fc843503        	ld	a0,-56(s0)
+   0x00000000802026c8 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+112>:	610c              	ld	a1,0(a0)
+   0x00000000802026ca <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+114>:	fdc42503        	lw	a0,-36(s0)
+   0x00000000802026ce <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+118>:	c188              	sw	a0,0(a1)
+   0x00000000802026d0 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+120>:	a009              	j	0x802026d2 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+122>
+   0x00000000802026d2 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+122>:	10500073        	wfi
+   0x00000000802026d6 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+126>:	bff5              	j	0x802026d2 <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+122>
+End of assembler dump.
+Temporary breakpoint 11 at 0x802026ce: file src/boards/qemu.rs, line 53.
+
+Temporary breakpoint 11, 0x00000000802026ce in os::board::{impl#1}::exit (self=0x80206428, code=21845) at src/boards/qemu.rs:53
+53	            asm!(
+#0  0x00000000802026ce in os::board::{impl#1}::exit (self=0x80206428, code=21845) at src/boards/qemu.rs:53
+#1  0x00000000802026f2 in os::board::{impl#1}::exit_success (self=0x80206428) at src/boards/qemu.rs:69
+#2  0x00000000802016ea in os::rust_main () at src/main.rs:77
+#3  0x0000000080200010 in stext ()
+Backtrace stopped: frame did not save the PC
+self = 0x80206428
+code = 21845
+$8 = 0x5555
+$9 = 0x80206428
+$10 = 0x100000
+pc             0x802026ce	0x802026ce <os::board::{impl#1}::exit+118>
+a0             0x5555	21845
+a1             0x100000	1048576
+=> 0x802026ce <_ZN58_$LT$os..board..RISCV64$u20$as$u20$os..board..QEMUExit$GT$4exit17h16afb65661e7456cE+118>:	sw	a0,0(a1)
+/tmp/ch1-ref/trace.gdb:87: Error in sourced command file:
+Remote connection closed
