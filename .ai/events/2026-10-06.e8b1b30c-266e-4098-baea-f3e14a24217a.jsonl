@@ -1,0 +1,1 @@
+{"schema":"course-log-v1","id":"e8b1b30c-266e-4098-baea-f3e14a24217a","timestamp":"2026-10-06T04:39:34.523Z","session":"","type":"ai_prompt","actor":"ai","source":"ai-adapter","prompt":"确认course.py的功能，我记得其不提供pi agent的支持，所以之前我已经编写了一个pi的插件","tool":"pi"}
