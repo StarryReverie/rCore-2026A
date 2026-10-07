@@ -53,8 +53,98 @@ lazy_static! {
     /// per loaded application. Unused slots are `UnInit`, and all syscall counters
     /// start at zero.
     pub static ref TASK_MANAGER: TaskManager = {
-        todo!("task::TASK_MANAGER")
+        let num_app = get_num_app();
+        // Start from all-`UnInit` slots, then bring only the loaded
+        // applications online so unused slots keep the `UnInit` state.
+        let mut tasks = [TaskControlBlock {
+            task_status: TaskStatus::UnInit,
+            task_cx: TaskContext::zero_init(),
+            syscall_counts: [0; MAX_SYSCALL_NUM],
+        }; MAX_APP_NUM];
+        for (i, task) in tasks.iter_mut().enumerate().take(num_app) {
+            // Task IDs `0..num_app` map to the loaded applications; `init_app_cx`
+            // drops a `TrapContext` on the task's kernel stack and
+            // `goto_restore` makes `__restore` the first thing `__switch` runs.
+            task.task_cx = TaskContext::goto_restore(init_app_cx(i));
+            task.task_status = TaskStatus::Ready;
+        }
+        TaskManager {
+            num_app,
+            inner: unsafe {
+                UPSafeCell::new(TaskManagerInner {
+                    tasks,
+                    current_task: 0,
+                })
+            },
+        }
     };
+}
+
+impl TaskManager {
+    /// Give the CPU to application `0` for the first time.
+    fn run_first_task(&self) -> ! {
+        let mut inner = self.inner.exclusive_access();
+        inner.current_task = 0;
+        inner.tasks[0].task_status = TaskStatus::Running;
+        let next_task_cx_ptr = &inner.tasks[0].task_cx as *const TaskContext;
+        // Release the runtime borrow before switching stacks. `next_task_cx_ptr`
+        // points into the static `TASK_MANAGER`, so it stays valid afterwards.
+        drop(inner);
+        // The startup context is not needed again; `__switch` overwrites it.
+        let mut _unused = TaskContext::zero_init();
+        unsafe {
+            __switch(&mut _unused as *mut TaskContext, next_task_cx_ptr);
+        }
+        panic!("unreachable in run_first_task!");
+    }
+
+    /// Mark the current task `Ready` so it keeps its turn in the rotation.
+    fn mark_current_suspended(&self) {
+        let mut inner = self.inner.exclusive_access();
+        let current = inner.current_task;
+        inner.tasks[current].task_status = TaskStatus::Ready;
+    }
+
+    /// Mark the current task `Exited`, a terminal state it never leaves.
+    fn mark_current_exited(&self) {
+        let mut inner = self.inner.exclusive_access();
+        let current = inner.current_task;
+        inner.tasks[current].task_status = TaskStatus::Exited;
+    }
+
+    /// Find the next `Ready` task in round-robin order within `0..num_app`.
+    ///
+    /// The search starts just after the current task and wraps around, so the
+    /// current task itself is only chosen after every other loaded task was
+    /// inspected once. `UnInit` and `Exited` slots are never selected.
+    fn find_next_task(&self) -> Option<usize> {
+        let inner = self.inner.exclusive_access();
+        let current = inner.current_task;
+        (current + 1..=current + self.num_app)
+            .map(|id| id % self.num_app)
+            .find(|id| inner.tasks[*id].task_status == TaskStatus::Ready)
+    }
+
+    /// Switch from the current task to the next ready one, if any.
+    fn run_next_task(&self) {
+        if let Some(next) = self.find_next_task() {
+            let mut inner = self.inner.exclusive_access();
+            let current = inner.current_task;
+            inner.tasks[next].task_status = TaskStatus::Running;
+            inner.current_task = next;
+            let current_task_cx_ptr = &mut inner.tasks[current].task_cx as *mut TaskContext;
+            let next_task_cx_ptr = &inner.tasks[next].task_cx as *const TaskContext;
+            // Release the runtime borrow before switching stacks; both context
+            // pointers point into the static `TASK_MANAGER` and stay valid.
+            drop(inner);
+            unsafe {
+                __switch(current_task_cx_ptr, next_task_cx_ptr);
+            }
+            // Control returns here when this task is scheduled again.
+        } else {
+            panic!("All applications completed!");
+        }
+    }
 }
 
 /// Record one system call made by the current task.
@@ -84,7 +174,7 @@ pub fn current_syscall_count(syscall_id: usize) -> usize {
 /// Constraints: Used only for initial task startup. Task 0 is `Running` and is
 /// identified by `current_task`.
 pub fn run_first_task() {
-    todo!("task::run_first_task")
+    TASK_MANAGER.run_first_task();
 }
 
 /// Todo: Suspend the current task and yield the CPU.
@@ -96,7 +186,8 @@ pub fn run_first_task() {
 /// retains the context needed to resume. This entry point must support both
 /// voluntary yielding and timer preemption.
 pub fn suspend_current_and_run_next() {
-    todo!("task::suspend_current_and_run_next")
+    TASK_MANAGER.mark_current_suspended();
+    TASK_MANAGER.run_next_task();
 }
 
 /// Todo: Exit the current task and relinquish the CPU.
@@ -106,5 +197,6 @@ pub fn suspend_current_and_run_next() {
 /// task; it never resumes at the call site.
 /// Constraints: The exiting task is `Exited` and must never be scheduled again.
 pub fn exit_current_and_run_next() {
-    todo!("task::exit_current_and_run_next")
+    TASK_MANAGER.mark_current_exited();
+    TASK_MANAGER.run_next_task();
 }
