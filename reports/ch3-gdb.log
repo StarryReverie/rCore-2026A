@@ -1,0 +1,310 @@
+================================================================
+rCore ch3 GDB trace: task startup, timer preemption, syscall
+accounting, sys_yield suspend/resume and task exit
+kernel: ch3 reference (MODE=debug), apps app_0..app_12 (BASE=2)
+================================================================
+0x0000000000001000 in ?? ()
+
+
+===== [0] startup: run_first_task -> TASK_MANAGER init =====
+Temporary breakpoint 1 at 0x8020400c: file src/task/mod.rs, line 164.
+
+Temporary breakpoint 1, os::task::run_first_task () at src/task/mod.rs:164
+164	    TASK_MANAGER.run_first_task();
+Warning: the current language does not match this frame.
+-- hit os::task::run_first_task (before TASK_MANAGER first deref)
+#0  os::task::run_first_task () at src/task/mod.rs:164
+#1  0x00000000802038bc in os::rust_main () at src/main.rs:105
+#2  0x0000000080200010 in stext ()
+Backtrace stopped: frame did not save the PC
+ra             0x802038bc	0x802038bc <os::rust_main+72>
+sp             0x802eefa0	0x802eefa0
+Breakpoint 2 at 0x802012ec: file src/loader.rs, line 99.
+Temporary breakpoint 3 at 0x80201060: file src/loader.rs, line 61.
+
+Temporary breakpoint 3, os::loader::get_num_app () at src/loader.rs:61
+61	    unsafe { (_num_app as usize as *const usize).read_volatile() }
+-- get_num_app() during TASK_MANAGER init
+#0  os::loader::get_num_app () at src/loader.rs:61
+#1  0x0000000080204a2a in os::task::{impl#1}::deref::__static_ref_initialize () at src/task/mod.rs:53
+#2  core::ops::function::FnOnce::call_once<fn() -> os::task::TaskManager, ()> () at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/ops/function.rs:250
+#3  0x0000000080201c52 in spin::once::{impl#4}::call_once::{closure#0}<os::task::TaskManager, spin::relax::Spin, fn() -> os::task::TaskManager> () at /home/starryreverie/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.9/src/once.rs:174
+0x0000000080204a2a in os::task::{impl#1}::deref::__static_ref_initialize () at src/task/mod.rs:53
+53	        let num_app = get_num_app();
+Value returned is $1 = 13
+-- get_num_app returned 13
+Breakpoint 4 at 0x80203954: file src/task/mod.rs, line 82.
+[init_app_cx] call #1, app_id = 0
+[init_app_cx] call #2, app_id = 1
+[init_app_cx] call #3, app_id = 2
+[init_app_cx] call #4, app_id = 3
+[init_app_cx] call #5, app_id = 4
+[init_app_cx] call #6, app_id = 5
+[init_app_cx] call #7, app_id = 6
+[init_app_cx] call #8, app_id = 7
+[init_app_cx] call #9, app_id = 8
+[init_app_cx] call #10, app_id = 9
+[init_app_cx] call #11, app_id = 10
+[init_app_cx] call #12, app_id = 11
+[init_app_cx] call #13, app_id = 12
+[init_app_cx] call #14, app_id = 13
+[init_app_cx] call #15, app_id = 14
+[init_app_cx] call #16, app_id = 15
+
+Breakpoint 4, os::task::TaskManager::run_first_task (self=0x8030f128 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>) at src/task/mod.rs:82
+82	        let mut inner = self.inner.exclusive_access();
+-- hit TaskManager::run_first_task
+#0  os::task::TaskManager::run_first_task (self=0x8030f128 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>) at src/task/mod.rs:82
+#1  0x0000000080204024 in os::task::run_first_task () at src/task/mod.rs:164
+#2  0x00000000802038bc in os::rust_main () at src/main.rs:105
+#3  0x0000000080200010 in stext ()
+Backtrace stopped: frame did not save the PC
+-- init_app_cx called 16 times
+
+
+===== [1] __switch -> __restore -> user =====
+Temporary breakpoint 5 at 0x802020ce
+
+Temporary breakpoint 5, 0x00000000802020ce in __switch ()
+-- first __switch entry
+#0  0x00000000802020ce in __switch ()
+#1  0x00000000802039be in os::task::TaskManager::run_first_task (self=0x8030f128 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>) at src/task/mod.rs:90
+#2  0x0000000080204024 in os::task::run_first_task () at src/task/mod.rs:164
+#3  0x00000000802038bc in os::rust_main () at src/main.rs:105
+a0             0x802eeed8	2150559448
+a1             0x8030f130	2150691120
+ra             0x802039be	0x802039be <os::task::TaskManager::run_first_task+118>
+sp             0x802eeea0	0x802eeea0
+-- a0 -> context to save (boot), a1 -> task 0 TaskContext
+0x8030f130 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+8>:	0x0000000080202390	0x000000008020eef0
+0x8030f140 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+24>:	0x0000000000000000	0x0000000000000000
+0x8030f150 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+40>:	0x0000000000000000	0x0000000000000000
+0x8030f160 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+56>:	0x0000000000000000	0x0000000000000000
+0x8030f170 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+72>:	0x0000000000000000	0x0000000000000000
+0x8030f180 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+88>:	0x0000000000000000	0x0000000000000000
+0x8030f190 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+104>:	0x0000000000000000	0x0000000000000000
+Temporary breakpoint 6 at 0x80202390
+
+Temporary breakpoint 6, 0x0000000080202390 in __restore ()
+-- first __restore; sp -> TrapContext (34 words)
+sp             0x8020eef0	0x8020eef0 <os::loader::KERNEL_STACK+7920>
+0x8020eef0 <_ZN2os6loader12KERNEL_STACK17h20bb707874db8f10E+7920>:	0x0000000000000000	0x0000000000000000
+0x8020ef00 <_ZN2os6loader12KERNEL_STACK17h20bb707874db8f10E+7936>:	0x000000008022e000	0x0000000000000000
+0x8020ef10 <_ZN2os6loader12KERNEL_STACK17h20bb707874db8f10E+7952>:	0x0000000000000000	0x0000000000000000
+0x8020ef20 <_ZN2os6loader12KERNEL_STACK17h20bb707874db8f10E+7968>:	0x0000000000000000	0x0000000000000000
+0x8020ef30 <_ZN2os6loader12KERNEL_STACK17h20bb707874db8f10E+7984>:	0x0000000000000000	0x0000000000000000
+0x8020ef40 <_ZN2os6loader12KERNEL_STACK17h20bb707874db8f10E+8000>:	0x0000000000000000	0x0000000000000000
+0x8020ef50 <_ZN2os6loader12KERNEL_STACK17h20bb707874db8f10E+8016>:	0x0000000000000000	0x0000000000000000
+0x8020ef60 <_ZN2os6loader12KERNEL_STACK17h20bb707874db8f10E+8032>:	0x0000000000000000	0x0000000000000000
+0x8020ef70 <_ZN2os6loader12KERNEL_STACK17h20bb707874db8f10E+8048>:	0x0000000000000000	0x0000000000000000
+0x8020ef80 <_ZN2os6loader12KERNEL_STACK17h20bb707874db8f10E+8064>:	0x0000000000000000	0x0000000000000000
+0x8020ef90 <_ZN2os6loader12KERNEL_STACK17h20bb707874db8f10E+8080>:	0x0000000000000000	0x0000000000000000
+0x8020efa0 <_ZN2os6loader12KERNEL_STACK17h20bb707874db8f10E+8096>:	0x0000000000000000	0x0000000000000000
+0x8020efb0 <_ZN2os6loader12KERNEL_STACK17h20bb707874db8f10E+8112>:	0x0000000000000000	0x0000000000000000
+0x8020efc0 <_ZN2os6loader12KERNEL_STACK17h20bb707874db8f10E+8128>:	0x0000000000000000	0x0000000000000000
+0x8020efd0 <_ZN2os6loader12KERNEL_STACK17h20bb707874db8f10E+8144>:	0x0000000000000000	0x0000000000000000
+0x8020efe0 <_ZN2os6loader12KERNEL_STACK17h20bb707874db8f10E+8160>:	0x0000000000000000	0x0000000000000000
+0x8020eff0 <_ZN2os6loader12KERNEL_STACK17h20bb707874db8f10E+8176>:	0x0000000200000000	0x0000000080400000
+-- sepc = 0x80400000 ; user sp x[2] = 0x8022e000
+
+
+===== [2] timer preemption =====
+Temporary breakpoint 7 at 0x80202444: file src/trap/mod.rs, line 49.
+
+Temporary breakpoint 7, os::trap::trap_handler (cx=0x8020eef0 <os::loader::KERNEL_STACK+7920>) at src/trap/mod.rs:49
+49	    let scause = scause::read(); // get trap cause
+-- trap_handler with SupervisorTimer
+#0  os::trap::trap_handler (cx=0x8020eef0 <os::loader::KERNEL_STACK+7920>) at src/trap/mod.rs:49
+#1  0x0000000080202390 in __alltraps ()
+Backtrace stopped: frame did not save the PC
+scause         0x8000000000000005	-9223372036854775803
+sepc           0x80400000	2151677952
+Temporary breakpoint 8 at 0x802076c8: file src/timer.rs, line 34.
+
+Temporary breakpoint 8, os::timer::set_next_trigger () at src/timer.rs:34
+34	    set_timer(get_time() + CLOCK_FREQ / TICKS_PER_SEC);
+-- set_next_trigger
+#0  os::timer::set_next_trigger () at src/timer.rs:34
+#1  0x00000000802024c4 in os::trap::trap_handler (cx=0x8020eef0 <os::loader::KERNEL_STACK+7920>) at src/trap/mod.rs:68
+#2  0x0000000080202390 in __alltraps ()
+Backtrace stopped: frame did not save the PC
+Temporary breakpoint 9 at 0x802040a4: file src/task/mod.rs, line 185.
+
+Temporary breakpoint 9, os::task::suspend_current_and_run_next () at src/task/mod.rs:185
+185	    mark_current_suspended();
+-- suspend_current_and_run_next (timer path)
+#0  os::task::suspend_current_and_run_next () at src/task/mod.rs:185
+#1  0x00000000802024cc in os::trap::trap_handler (cx=0x8020eef0 <os::loader::KERNEL_STACK+7920>) at src/trap/mod.rs:69
+#2  0x0000000080202390 in __alltraps ()
+Backtrace stopped: frame did not save the PC
+Temporary breakpoint 10 at 0x80203b50: file src/task/mod.rs, line 113.
+
+Temporary breakpoint 10, os::task::TaskManager::find_next_task (self=0x8030f128 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>) at src/task/mod.rs:113
+113	        let inner = self.inner.exclusive_access();
+-- find_next_task selects successor
+#0  os::task::TaskManager::find_next_task (self=0x8030f128 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>) at src/task/mod.rs:113
+#1  0x0000000080203c6e in os::task::TaskManager::run_next_task (self=0x8030f128 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>) at src/task/mod.rs:123
+#2  0x0000000080204044 in os::task::run_next_task () at src/task/mod.rs:170
+#3  0x00000000802040b4 in os::task::suspend_current_and_run_next () at src/task/mod.rs:186
+#4  0x00000000802024cc in os::trap::trap_handler (cx=0x8020eef0 <os::loader::KERNEL_STACK+7920>) at src/trap/mod.rs:69
+Temporary breakpoint 11 at 0x802020ce
+
+Temporary breakpoint 11, 0x00000000802020ce in __switch ()
+-- __switch after timer preemption
+a0             0x8030f130	2150691120
+a1             0x8030fe80	2150694528
+ra             0x80203e14	0x80203e14 <os::task::TaskManager::run_next_task+446>
+sp             0x8020e880	0x8020e880 <os::loader::KERNEL_STACK+6272>
+0x8030fe80 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+3416>:	0x0000000080202390	0x0000000080210ef0
+0x8030fe90 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+3432>:	0x0000000000000000	0x0000000000000000
+0x8030fea0 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+3448>:	0x0000000000000000	0x0000000000000000
+0x8030feb0 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+3464>:	0x0000000000000000	0x0000000000000000
+0x8030fec0 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+3480>:	0x0000000000000000	0x0000000000000000
+0x8030fed0 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+3496>:	0x0000000000000000	0x0000000000000000
+0x8030fee0 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+3512>:	0x0000000000000000	0x0000000000000000
+-- TCB stride = 3408
+-- current task index = 0, successor index = 1
+
+
+===== [3] syscall accounting =====
+Temporary breakpoint 12 at 0x80203e42: file src/task/mod.rs, line 144.
+
+Temporary breakpoint 12, os::task::record_current_syscall (syscall_id=64) at src/task/mod.rs:144
+144	    let mut inner = TASK_MANAGER.inner.exclusive_access();
+-- first record_current_syscall (called before dispatch)
+#0  os::task::record_current_syscall (syscall_id=64) at src/task/mod.rs:144
+#1  0x0000000080207e9c in os::syscall::syscall (syscall_id=64, args=...) at src/syscall/mod.rs:34
+#2  0x000000008020293e in os::trap::trap_handler (cx=0x80216ef0 <os::loader::KERNEL_STACK+40688>) at src/trap/mod.rs:57
+#3  0x0000000080202390 in __alltraps ()
+Backtrace stopped: frame did not save the PC
+-- syscall_id = 64
+-- note: sys_trace (id=410) is not reached in this debug run: the
+   debug user build makes ch3_sleep/ch3_trace panic on get_time()==0,
+   so the sys_trace query path is analysed from source instead.
+
+
+===== [4] sys_yield (ch3b_yield0) =====
+Temporary breakpoint 13 at 0x802078d0: file src/syscall/process.rs, line 23.
+
+Temporary breakpoint 13, os::syscall::process::sys_yield () at src/syscall/process.rs:23
+23	    trace!("kernel: sys_yield");
+-- hit sys_yield
+#0  os::syscall::process::sys_yield () at src/syscall/process.rs:23
+#1  0x0000000080207f84 in os::syscall::syscall (syscall_id=124, args=...) at src/syscall/mod.rs:38
+#2  0x000000008020293e in os::trap::trap_handler (cx=0x80220ef0 <os::loader::KERNEL_STACK+81648>) at src/trap/mod.rs:57
+#3  0x0000000080202390 in __alltraps ()
+Backtrace stopped: frame did not save the PC
+Temporary breakpoint 14 at 0x802040a4: file src/task/mod.rs, line 185.
+
+Temporary breakpoint 14, os::task::suspend_current_and_run_next () at src/task/mod.rs:185
+185	    mark_current_suspended();
+-- suspend_current_and_run_next (yield path)
+#0  os::task::suspend_current_and_run_next () at src/task/mod.rs:185
+#1  0x00000000802078f4 in os::syscall::process::sys_yield () at src/syscall/process.rs:24
+#2  0x0000000080207f84 in os::syscall::syscall (syscall_id=124, args=...) at src/syscall/mod.rs:38
+#3  0x000000008020293e in os::trap::trap_handler (cx=0x80220ef0 <os::loader::KERNEL_STACK+81648>) at src/trap/mod.rs:57
+#4  0x0000000080202390 in __alltraps ()
+Backtrace stopped: frame did not save the PC
+Temporary breakpoint 15 at 0x80203b50: file src/task/mod.rs, line 113.
+
+Temporary breakpoint 15, os::task::TaskManager::find_next_task (self=0x8030f128 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>) at src/task/mod.rs:113
+113	        let inner = self.inner.exclusive_access();
+-- find_next_task selects successor
+#0  os::task::TaskManager::find_next_task (self=0x8030f128 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>) at src/task/mod.rs:113
+#1  0x0000000080203c6e in os::task::TaskManager::run_next_task (self=0x8030f128 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>) at src/task/mod.rs:123
+#2  0x0000000080204044 in os::task::run_next_task () at src/task/mod.rs:170
+#3  0x00000000802040b4 in os::task::suspend_current_and_run_next () at src/task/mod.rs:186
+#4  0x00000000802078f4 in os::syscall::process::sys_yield () at src/syscall/process.rs:24
+Temporary breakpoint 16 at 0x802020ce
+
+Temporary breakpoint 16, 0x00000000802020ce in __switch ()
+-- __switch for yield
+a0             0x80316900	2150721792
+a1             0x80317650	2150725200
+ra             0x80203e14	0x80203e14 <os::task::TaskManager::run_next_task+446>
+sp             0x80220740	0x80220740 <os::loader::KERNEL_STACK+79680>
+-- context to save (a0):
+0x80316900 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+30680>:	0x0000000080202390	0x0000000080220ef0
+0x80316910 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+30696>:	0x0000000000000000	0x0000000000000000
+0x80316920 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+30712>:	0x0000000000000000	0x0000000000000000
+0x80316930 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+30728>:	0x0000000000000000	0x0000000000000000
+0x80316940 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+30744>:	0x0000000000000000	0x0000000000000000
+0x80316950 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+30760>:	0x0000000000000000	0x0000000000000000
+0x80316960 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+30776>:	0x0000000000000000	0x0000000000000000
+-- context to restore (a1):
+0x80317650 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+34088>:	0x0000000080202390	0x0000000080222ef0
+0x80317660 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+34104>:	0x0000000000000000	0x0000000000000000
+0x80317670 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+34120>:	0x0000000000000000	0x0000000000000000
+0x80317680 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+34136>:	0x0000000000000000	0x0000000000000000
+0x80317690 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+34152>:	0x0000000000000000	0x0000000000000000
+0x803176a0 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+34168>:	0x0000000000000000	0x0000000000000000
+0x803176b0 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+34184>:	0x0000000000000000	0x0000000000000000
+-- current task index = 9, successor index = 10
+-- suspended task will resume at ra=0x80203e14 with sp=0x80220740
+Temporary breakpoint 17 at 0x80203e14: file src/task/mod.rs, line 133.
+
+Temporary breakpoint 17, 0x0000000080203e14 in os::task::TaskManager::run_next_task (self=0x8030f128 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>) at src/task/mod.rs:133
+133	                __switch(current_task_cx_ptr, next_task_cx_ptr);
+-- suspended task resumed at its saved ra/sp
+#0  0x0000000080203e14 in os::task::TaskManager::run_next_task (self=0x8030f128 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>) at src/task/mod.rs:133
+#1  0x0000000080204044 in os::task::run_next_task () at src/task/mod.rs:170
+#2  0x00000000802040b4 in os::task::suspend_current_and_run_next () at src/task/mod.rs:186
+#3  0x00000000802078f4 in os::syscall::process::sys_yield () at src/syscall/process.rs:24
+#4  0x0000000080207f84 in os::syscall::syscall (syscall_id=124, args=...) at src/syscall/mod.rs:38
+#5  0x000000008020293e in os::trap::trap_handler (cx=0x80220ef0 <os::loader::KERNEL_STACK+81648>) at src/trap/mod.rs:57
+ra             0x80203e14	0x80203e14 <os::task::TaskManager::run_next_task+446>
+sp             0x80220740	0x80220740 <os::loader::KERNEL_STACK+79680>
+
+
+===== [5] task exit =====
+Temporary breakpoint 18 at 0x802040c4: file src/task/mod.rs, line 191.
+
+Temporary breakpoint 18, os::task::exit_current_and_run_next () at src/task/mod.rs:191
+191	    mark_current_exited();
+-- exit_current_and_run_next
+#0  os::task::exit_current_and_run_next () at src/task/mod.rs:191
+#1  0x00000000802077bc in os::syscall::process::sys_exit (exit_code=-1) at src/syscall/process.rs:17
+#2  0x0000000080207f7c in os::syscall::syscall (syscall_id=93, args=...) at src/syscall/mod.rs:37
+#3  0x000000008020293e in os::trap::trap_handler (cx=0x80214ef0 <os::loader::KERNEL_STACK+32496>) at src/trap/mod.rs:57
+#4  0x0000000080202390 in __alltraps ()
+Backtrace stopped: frame did not save the PC
+Temporary breakpoint 19 at 0x80203aa2: file src/task/mod.rs, line 104.
+
+Temporary breakpoint 19, os::task::TaskManager::mark_current_exited (self=0x8030f128 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>) at src/task/mod.rs:104
+104	        let mut inner = self.inner.exclusive_access();
+-- mark_current_exited
+#0  os::task::TaskManager::mark_current_exited (self=0x8030f128 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>) at src/task/mod.rs:104
+#1  0x0000000080204094 in os::task::mark_current_exited () at src/task/mod.rs:180
+#2  0x00000000802040cc in os::task::exit_current_and_run_next () at src/task/mod.rs:191
+#3  0x00000000802077bc in os::syscall::process::sys_exit (exit_code=-1) at src/syscall/process.rs:17
+#4  0x0000000080207f7c in os::syscall::syscall (syscall_id=93, args=...) at src/syscall/mod.rs:37
+Temporary breakpoint 20 at 0x80203b50: file src/task/mod.rs, line 113.
+
+Temporary breakpoint 20, os::task::TaskManager::find_next_task (self=0x8030f128 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>) at src/task/mod.rs:113
+113	        let inner = self.inner.exclusive_access();
+-- find_next_task after exit (Exited slot excluded)
+#0  os::task::TaskManager::find_next_task (self=0x8030f128 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>) at src/task/mod.rs:113
+#1  0x0000000080203c6e in os::task::TaskManager::run_next_task (self=0x8030f128 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>) at src/task/mod.rs:123
+#2  0x0000000080204044 in os::task::run_next_task () at src/task/mod.rs:170
+#3  0x00000000802040d4 in os::task::exit_current_and_run_next () at src/task/mod.rs:192
+#4  0x00000000802077bc in os::syscall::process::sys_exit (exit_code=-1) at src/syscall/process.rs:17
+Temporary breakpoint 21 at 0x802020ce
+
+Temporary breakpoint 21, 0x00000000802020ce in __switch ()
+-- __switch after exit
+a0             0x80311920	2150701344
+a1             0x80312670	2150704752
+ra             0x80203e14	0x80203e14 <os::task::TaskManager::run_next_task+446>
+sp             0x802146c0	0x802146c0 <os::loader::KERNEL_STACK+30400>
+0x80312670 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+13640>:	0x0000000080203e14	0x0000000080216880
+0x80312680 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+13656>:	0x0000000080216970	0x0000000000000000
+0x80312690 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+13672>:	0x0000000000000000	0x0000000000000000
+0x803126a0 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+13688>:	0x0000000000000000	0x0000000000000000
+0x803126b0 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+13704>:	0x0000000000000000	0x0000000000000000
+0x803126c0 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+13720>:	0x0000000000000000	0x0000000000000000
+0x803126d0 <_ZN66_$LT$os..task..TASK_MANAGER$u20$as$u20$core..ops..deref..Deref$GT$5deref11__stability4LAZY17h763933debfcca68bE+13736>:	0x0000000000000000	0x0000000000000000
+-- current task index = 3, successor index = 4
+
+
+===== end of trace =====
+[Inferior 1 (process 1) detached]
