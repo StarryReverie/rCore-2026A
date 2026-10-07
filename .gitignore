@@ -40,6 +40,13 @@ __pycache__/
 /.opencode/rcore-hooks/
 /.opencode/plugins/rcore-session-archive.js
 
+# pi course-recording extension; client config stays local.
+!/.pi/
+/.pi/*
+!/.pi/extensions/
+!/.pi/extensions/**
+!/.pi/session-archive.example.json
+
 # >>> course-tool records
 !/.ai/
 !/.ai/.gitignore
