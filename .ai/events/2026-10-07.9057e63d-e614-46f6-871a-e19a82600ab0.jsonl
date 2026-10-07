@@ -1,0 +1,1 @@
+{"schema":"course-log-v1","id":"9057e63d-e614-46f6-871a-e19a82600ab0","timestamp":"2026-10-07T12:36:44.085Z","session":"","type":"ai_file_operation","actor":"ai","source":"ai-adapter","file":"reports/ch4-qemu-run.log","tool":"pi","operation":"read","confidence":"high"}

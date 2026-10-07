@@ -1,0 +1,1 @@
+{"schema":"course-log-v1","id":"5f4e912f-8e8c-4e77-81ab-ddbfaaab5f69","timestamp":"2026-10-07T12:37:20.212Z","session":"","type":"ai_command_result","actor":"ai","source":"ai-adapter","command":"ps -e -o pid,comm | grep -i qemu || echo \"no leftover qemu\"","cwd":".","exit_code":0,"duration_ms":18,"tool":"pi"}

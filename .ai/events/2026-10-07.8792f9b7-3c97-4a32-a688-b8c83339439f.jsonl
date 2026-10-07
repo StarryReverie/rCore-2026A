@@ -1,0 +1,1 @@
+{"schema":"course-log-v1","id":"8792f9b7-3c97-4a32-a688-b8c83339439f","timestamp":"2026-10-07T11:42:05.118Z","session":"","type":"ai_file_operation","actor":"ai","source":"ai-adapter","file":"os/Makefile","tool":"pi","operation":"edit","confidence":"high"}
