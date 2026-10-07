@@ -1,0 +1,765 @@
+0x0000000000001000 in ?? ()
+Breakpoint 1 at 0x802161a0: file src/task/mod.rs, line 173.
+Breakpoint 2 at 0x8020ac88: file src/mm/memory_set.rs, line 89.
+Breakpoint 3 at 0x8021c46a: file src/mm/page_table.rs, line 144.
+Breakpoint 4 at 0x8020c976: file src/mm/memory_set.rs, line 253.
+Breakpoint 5 at 0x8020c98a: file src/mm/memory_set.rs, line 256.
+Breakpoint 6 at 0x8020d512: file src/mm/memory_set.rs, line 455.
+Breakpoint 7 at 0x8020c0ca: file src/mm/memory_set.rs, line 165.
+Breakpoint 8 at 0x8020c474: file src/mm/memory_set.rs, line 210.
+Breakpoint 9 at 0x8021943c: src/syscall/fs.rs:10. (2 locations)
+Breakpoint 10 at 0x8021c798: file src/mm/page_table.rs, line 184.
+Breakpoint 11 at 0x80218c9a: src/syscall/process.rs:100. (2 locations)
+Breakpoint 12 at 0x8020aae2: file src/mm/memory_set.rs, line 61.
+Breakpoint 13 at 0x80218ec2: src/syscall/process.rs:129. (2 locations)
+Breakpoint 14 at 0x8020ca9a: src/mm/memory_set.rs:284. (3 locations)
+Breakpoint 15 at 0x8021903a: src/syscall/process.rs:145. (2 locations)
+Breakpoint 16 at 0x8020cc2e: src/mm/memory_set.rs:311. (2 locations)
+Breakpoint 17 at 0x8020cb8e: src/mm/memory_set.rs:296. (2 locations)
+Breakpoint 18 at 0x80218ab8: src/syscall/process.rs:70. (2 locations)
+Breakpoint 19 at 0x8021c61c: file src/mm/page_table.rs, line 163.
+
+===== [1] MemorySet::new_kernel (KERNEL_SPACE lazy init) =====
+#0  os::mm::memory_set::MemorySet::new_kernel () at src/mm/memory_set.rs:89
+#1  0x000000008021ad90 in os::mm::memory_set::{impl#2}::deref::__static_ref_initialize () at src/mm/memory_set.rs:34
+#2  core::ops::function::FnOnce::call_once<fn() -> alloc::sync::Arc<os::sync::up::UPSafeCell<os::mm::memory_set::MemorySet>, alloc::alloc::Global>, ()> () at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/ops/function.rs:250
+#3  0x000000008021a778 in spin::once::{impl#4}::call_once::{closure#0}<alloc::sync::Arc<os::sync::up::UPSafeCell<os::mm::memory_set::MemorySet>, alloc::alloc::Global>, spin::relax::Spin, fn() -> alloc::sync::Arc<os::sync::up::UPSafeCell<os::mm::memory_set::MemorySet>, alloc::alloc::Global>> () at /home/starryreverie/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.9/src/once.rs:174
+
+----- [1] PageTable::map #1 -----
+self = 0x808a8ec8
+vpn = os::mm::address::VirtPageNum (134217727)
+ppn = os::mm::address::PhysPageNum (524801)
+flags = os::mm::page_table::PTEFlags {bits: 10}
+$1 = 0x7ffffff
+$2 = 0x80201
+$3 = 0xa
+#0  os::mm::page_table::PageTable::map (self=0x808a8ec8, vpn=..., ppn=..., flags=...) at src/mm/page_table.rs:144
+#1  0x000000008020ac20 in os::mm::memory_set::MemorySet::map_trampoline (self=0x808a8ec8) at src/mm/memory_set.rs:79
+#2  0x000000008020aca2 in os::mm::memory_set::MemorySet::new_kernel () at src/mm/memory_set.rs:91
+#3  0x000000008021ad90 in os::mm::memory_set::{impl#2}::deref::__static_ref_initialize () at src/mm/memory_set.rs:34
+#4  core::ops::function::FnOnce::call_once<fn() -> alloc::sync::Arc<os::sync::up::UPSafeCell<os::mm::memory_set::MemorySet>, alloc::alloc::Global>, ()> () at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/ops/function.rs:250
+#5  0x000000008021a778 in spin::once::{impl#4}::call_once::{closure#0}<alloc::sync::Arc<os::sync::up::UPSafeCell<os::mm::memory_set::MemorySet>, alloc::alloc::Global>, spin::relax::Spin, fn() -> alloc::sync::Arc<os::sync::up::UPSafeCell<os::mm::memory_set::MemorySet>, alloc::alloc::Global>> () at /home/starryreverie/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.9/src/once.rs:174
+
+----- [1] PageTable::map #2 -----
+self = 0x808a8ec8
+vpn = os::mm::address::VirtPageNum (524800)
+ppn = os::mm::address::PhysPageNum (524800)
+flags = os::mm::page_table::PTEFlags {bits: 10}
+$4 = 0x80200
+$5 = 0x80200
+$6 = 0xa
+#0  os::mm::page_table::PageTable::map (self=0x808a8ec8, vpn=..., ppn=..., flags=...) at src/mm/page_table.rs:144
+#1  0x000000008020ce18 in os::mm::memory_set::MapArea::map_one (self=0x808a9708, page_table=0x808a8ec8, vpn=...) at src/mm/memory_set.rs:362
+#2  0x000000008020cf52 in os::mm::memory_set::MapArea::map (self=0x808a9708, page_table=0x808a8ec8) at src/mm/memory_set.rs:374
+#3  0x000000008020ab24 in os::mm::memory_set::MemorySet::push (self=0x808a8ec8, map_area=..., data=...) at src/mm/memory_set.rs:67
+#4  0x000000008020b904 in os::mm::memory_set::MemorySet::new_kernel () at src/mm/memory_set.rs:101
+#5  0x000000008021ad90 in os::mm::memory_set::{impl#2}::deref::__static_ref_initialize () at src/mm/memory_set.rs:34
+
+----- [1] PageTable::map #3 -----
+self = 0x808a8ec8
+vpn = os::mm::address::VirtPageNum (524801)
+ppn = os::mm::address::PhysPageNum (524801)
+flags = os::mm::page_table::PTEFlags {bits: 10}
+$7 = 0x80201
+$8 = 0x80201
+$9 = 0xa
+#0  os::mm::page_table::PageTable::map (self=0x808a8ec8, vpn=..., ppn=..., flags=...) at src/mm/page_table.rs:144
+#1  0x000000008020ce18 in os::mm::memory_set::MapArea::map_one (self=0x808a9708, page_table=0x808a8ec8, vpn=...) at src/mm/memory_set.rs:362
+#2  0x000000008020cf52 in os::mm::memory_set::MapArea::map (self=0x808a9708, page_table=0x808a8ec8) at src/mm/memory_set.rs:374
+#3  0x000000008020ab24 in os::mm::memory_set::MemorySet::push (self=0x808a8ec8, map_area=..., data=...) at src/mm/memory_set.rs:67
+#4  0x000000008020b904 in os::mm::memory_set::MemorySet::new_kernel () at src/mm/memory_set.rs:101
+#5  0x000000008021ad90 in os::mm::memory_set::{impl#2}::deref::__static_ref_initialize () at src/mm/memory_set.rs:34
+
+----- [1] PageTable::map #4 -----
+self = 0x808a8ec8
+vpn = os::mm::address::VirtPageNum (524802)
+ppn = os::mm::address::PhysPageNum (524802)
+flags = os::mm::page_table::PTEFlags {bits: 10}
+$10 = 0x80202
+$11 = 0x80202
+$12 = 0xa
+#0  os::mm::page_table::PageTable::map (self=0x808a8ec8, vpn=..., ppn=..., flags=...) at src/mm/page_table.rs:144
+#1  0x000000008020ce18 in os::mm::memory_set::MapArea::map_one (self=0x808a9708, page_table=0x808a8ec8, vpn=...) at src/mm/memory_set.rs:362
+#2  0x000000008020cf52 in os::mm::memory_set::MapArea::map (self=0x808a9708, page_table=0x808a8ec8) at src/mm/memory_set.rs:374
+#3  0x000000008020ab24 in os::mm::memory_set::MemorySet::push (self=0x808a8ec8, map_area=..., data=...) at src/mm/memory_set.rs:67
+#4  0x000000008020b904 in os::mm::memory_set::MemorySet::new_kernel () at src/mm/memory_set.rs:101
+#5  0x000000008021ad90 in os::mm::memory_set::{impl#2}::deref::__static_ref_initialize () at src/mm/memory_set.rs:34
+
+===== [1] MemorySet::activate =====
+#0  os::mm::memory_set::MemorySet::activate (self=0x808aa098 <os::mm::heap_allocator::HEAP_SPACE+80>) at src/mm/memory_set.rs:253
+#1  0x00000000802141be in os::mm::init () at src/mm/mod.rs:27
+#2  0x0000000080211408 in os::rust_main () at src/main.rs:102
+$13 = 0x0
+----- [1] satp after activate -----
+$14 = 0x80000000000828ab
+
+===== [1] remap_test (kernel segment permissions) =====
+#0  os::mm::memory_set::remap_test () at src/mm/memory_set.rs:455
+#1  0x000000008021143a in os::rust_main () at src/main.rs:104
+#2  0x0000000080200010 in stext ()
+Backtrace stopped: frame did not save the PC
+$15 = 0x80000000000828ab
+
+===== [2] MemorySet::from_elf #1 =====
+elf_data = <error reading variable: value requires 315392 bytes, which is more than max-value-size>
+#0  os::mm::memory_set::MemorySet::from_elf (elf_data=...) at src/mm/memory_set.rs:165
+#1  0x000000008020e7ac in os::task::task::TaskControlBlock::new (elf_data=..., app_id=0) at src/task/task.rs:48
+#2  0x000000008021af8e in os::task::{impl#1}::deref::__static_ref_initialize () at src/task/mod.rs:60
+#3  core::ops::function::FnOnce::call_once<fn() -> os::task::TaskManager, ()> () at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/ops/function.rs:250
+#4  0x000000008021a7a0 in spin::once::{impl#4}::call_once::{closure#0}<os::task::TaskManager, spin::relax::Spin, fn() -> os::task::TaskManager> () at /home/starryreverie/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.9/src/once.rs:174
+
+----- [2] from_elf user stack #1 -----
+$16 = 0x12000
+$17 = 0x14000
+$18 = 0x11
+
+----- [4] insert_framed_area #1 -----
+self = 0x808aa098 <os::mm::heap_allocator::HEAP_SPACE+80>
+start_va = os::mm::address::VirtAddr (549755801600)
+end_va = os::mm::address::VirtAddr (549755809792)
+permission = os::mm::memory_set::MapPermission {bits: 6}
+#0  os::mm::memory_set::MemorySet::insert_framed_area (self=0x808aa098 <os::mm::heap_allocator::HEAP_SPACE+80>, start_va=..., end_va=..., permission=...) at src/mm/memory_set.rs:61
+#1  0x000000008020e9ae in os::task::task::TaskControlBlock::new (elf_data=..., app_id=0) at src/task/task.rs:56
+#2  0x000000008021af8e in os::task::{impl#1}::deref::__static_ref_initialize () at src/task/mod.rs:60
+#3  core::ops::function::FnOnce::call_once<fn() -> os::task::TaskManager, ()> () at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/ops/function.rs:250
+
+===== [2] MemorySet::from_elf #2 =====
+elf_data = <error reading variable: value requires 313328 bytes, which is more than max-value-size>
+#0  os::mm::memory_set::MemorySet::from_elf (elf_data=...) at src/mm/memory_set.rs:165
+#1  0x000000008020e7ac in os::task::task::TaskControlBlock::new (elf_data=..., app_id=1) at src/task/task.rs:48
+#2  0x000000008021af8e in os::task::{impl#1}::deref::__static_ref_initialize () at src/task/mod.rs:60
+#3  core::ops::function::FnOnce::call_once<fn() -> os::task::TaskManager, ()> () at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/ops/function.rs:250
+#4  0x000000008021a7a0 in spin::once::{impl#4}::call_once::{closure#0}<os::task::TaskManager, spin::relax::Spin, fn() -> os::task::TaskManager> () at /home/starryreverie/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.9/src/once.rs:174
+
+----- [2] from_elf user stack #2 -----
+$19 = 0x12000
+$20 = 0x14000
+$21 = 0x11
+
+----- [4] insert_framed_area #2 -----
+self = 0x808aa098 <os::mm::heap_allocator::HEAP_SPACE+80>
+start_va = os::mm::address::VirtAddr (549755789312)
+end_va = os::mm::address::VirtAddr (549755797504)
+permission = os::mm::memory_set::MapPermission {bits: 6}
+#0  os::mm::memory_set::MemorySet::insert_framed_area (self=0x808aa098 <os::mm::heap_allocator::HEAP_SPACE+80>, start_va=..., end_va=..., permission=...) at src/mm/memory_set.rs:61
+#1  0x000000008020e9ae in os::task::task::TaskControlBlock::new (elf_data=..., app_id=1) at src/task/task.rs:56
+#2  0x000000008021af8e in os::task::{impl#1}::deref::__static_ref_initialize () at src/task/mod.rs:60
+#3  core::ops::function::FnOnce::call_once<fn() -> os::task::TaskManager, ()> () at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/ops/function.rs:250
+
+----- [4] insert_framed_area #3 -----
+self = 0x808aa098 <os::mm::heap_allocator::HEAP_SPACE+80>
+start_va = os::mm::address::VirtAddr (549755777024)
+end_va = os::mm::address::VirtAddr (549755785216)
+permission = os::mm::memory_set::MapPermission {bits: 6}
+#0  os::mm::memory_set::MemorySet::insert_framed_area (self=0x808aa098 <os::mm::heap_allocator::HEAP_SPACE+80>, start_va=..., end_va=..., permission=...) at src/mm/memory_set.rs:61
+#1  0x000000008020e9ae in os::task::task::TaskControlBlock::new (elf_data=..., app_id=2) at src/task/task.rs:56
+#2  0x000000008021af8e in os::task::{impl#1}::deref::__static_ref_initialize () at src/task/mod.rs:60
+#3  core::ops::function::FnOnce::call_once<fn() -> os::task::TaskManager, ()> () at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/ops/function.rs:250
+
+----- [4] insert_framed_area #4 -----
+self = 0x808aa098 <os::mm::heap_allocator::HEAP_SPACE+80>
+start_va = os::mm::address::VirtAddr (549755764736)
+end_va = os::mm::address::VirtAddr (549755772928)
+permission = os::mm::memory_set::MapPermission {bits: 6}
+#0  os::mm::memory_set::MemorySet::insert_framed_area (self=0x808aa098 <os::mm::heap_allocator::HEAP_SPACE+80>, start_va=..., end_va=..., permission=...) at src/mm/memory_set.rs:61
+#1  0x000000008020e9ae in os::task::task::TaskControlBlock::new (elf_data=..., app_id=3) at src/task/task.rs:56
+#2  0x000000008021af8e in os::task::{impl#1}::deref::__static_ref_initialize () at src/task/mod.rs:60
+#3  core::ops::function::FnOnce::call_once<fn() -> os::task::TaskManager, ()> () at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/ops/function.rs:250
+
+----- [4] insert_framed_area #5 -----
+self = 0x808aa098 <os::mm::heap_allocator::HEAP_SPACE+80>
+start_va = os::mm::address::VirtAddr (549755752448)
+end_va = os::mm::address::VirtAddr (549755760640)
+permission = os::mm::memory_set::MapPermission {bits: 6}
+#0  os::mm::memory_set::MemorySet::insert_framed_area (self=0x808aa098 <os::mm::heap_allocator::HEAP_SPACE+80>, start_va=..., end_va=..., permission=...) at src/mm/memory_set.rs:61
+#1  0x000000008020e9ae in os::task::task::TaskControlBlock::new (elf_data=..., app_id=4) at src/task/task.rs:56
+#2  0x000000008021af8e in os::task::{impl#1}::deref::__static_ref_initialize () at src/task/mod.rs:60
+#3  core::ops::function::FnOnce::call_once<fn() -> os::task::TaskManager, ()> () at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/ops/function.rs:250
+
+----- [4] insert_framed_area #6 -----
+self = 0x808aa098 <os::mm::heap_allocator::HEAP_SPACE+80>
+start_va = os::mm::address::VirtAddr (549755740160)
+end_va = os::mm::address::VirtAddr (549755748352)
+permission = os::mm::memory_set::MapPermission {bits: 6}
+#0  os::mm::memory_set::MemorySet::insert_framed_area (self=0x808aa098 <os::mm::heap_allocator::HEAP_SPACE+80>, start_va=..., end_va=..., permission=...) at src/mm/memory_set.rs:61
+#1  0x000000008020e9ae in os::task::task::TaskControlBlock::new (elf_data=..., app_id=5) at src/task/task.rs:56
+#2  0x000000008021af8e in os::task::{impl#1}::deref::__static_ref_initialize () at src/task/mod.rs:60
+#3  core::ops::function::FnOnce::call_once<fn() -> os::task::TaskManager, ()> () at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/ops/function.rs:250
+
+===== [3] sys_write #1 =====
+fd = 1
+buf = 0xd000
+len = 23
+#0  os::syscall::fs::sys_write (fd=1, buf=0xd000, len=23) at src/syscall/fs.rs:10
+#1  0x0000000080216676 in os::syscall::syscall (syscall_id=64, args=...) at src/syscall/mod.rs:40
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [3] sys_write #2 =====
+fd = 1
+buf = 0xd000
+len = 23
+#0  os::syscall::fs::sys_write (fd=1, buf=0xd000, len=23) at src/syscall/fs.rs:10
+#1  0x0000000080216676 in os::syscall::syscall (syscall_id=64, args=...) at src/syscall/mod.rs:40
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+----- [3] translated_byte_buffer #1 -----
+token = 9223372036855310682
+ptr = 0xd000
+len = 23
+#0  os::mm::page_table::translated_byte_buffer (token=9223372036855310682, ptr=0xd000, len=23) at src/mm/page_table.rs:184
+#1  0x0000000080219520 in os::syscall::fs::sys_write (fd=1, buf=0xd000, len=23) at src/syscall/fs.rs:13
+#2  0x0000000080216676 in os::syscall::syscall (syscall_id=64, args=...) at src/syscall/mod.rs:40
+#3  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+#4  0x0000000000003202 in ?? ()
+
+===== [3] sys_write #3 =====
+fd = 1
+buf = 0xd000
+len = 23
+#0  os::syscall::fs::sys_write (fd=1, buf=0xd000, len=23) at src/syscall/fs.rs:10
+#1  0x0000000080216676 in os::syscall::syscall (syscall_id=64, args=...) at src/syscall/mod.rs:40
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+----- [3] translated_byte_buffer #2 -----
+token = 9223372036855310709
+ptr = 0xd000
+len = 23
+#0  os::mm::page_table::translated_byte_buffer (token=9223372036855310709, ptr=0xd000, len=23) at src/mm/page_table.rs:184
+#1  0x0000000080219520 in os::syscall::fs::sys_write (fd=1, buf=0xd000, len=23) at src/syscall/fs.rs:13
+#2  0x0000000080216676 in os::syscall::syscall (syscall_id=64, args=...) at src/syscall/mod.rs:40
+#3  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+#4  0x0000000000003202 in ?? ()
+
+----- [3] translated_byte_buffer #3 -----
+token = 9223372036855310736
+ptr = 0xd000
+len = 23
+#0  os::mm::page_table::translated_byte_buffer (token=9223372036855310736, ptr=0xd000, len=23) at src/mm/page_table.rs:184
+#1  0x0000000080219520 in os::syscall::fs::sys_write (fd=1, buf=0xd000, len=23) at src/syscall/fs.rs:13
+#2  0x0000000080216676 in os::syscall::syscall (syscall_id=64, args=...) at src/syscall/mod.rs:40
+#3  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+#4  0x0000000000003202 in ?? ()
+
+----- [7] translate_user #1 -----
+self = 0xfffffffffffe9820
+addr = 81288
+permission = os::mm::page_table::PTEFlags {bits: 4}
+#0  os::mm::page_table::PageTable::translate_user (self=0xfffffffffffe9820, addr=81288, permission=...) at src/mm/page_table.rs:163
+#1  0x0000000080218852 in os::syscall::process::sys_get_time (ts=0x13d88, _tz=0) at src/syscall/process.rs:45
+#2  0x00000000802166a8 in os::syscall::syscall (syscall_id=169, args=...) at src/syscall/mod.rs:43
+#3  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+#4  0x0000000000002ffa in ?? ()
+
+----- [7] translate_user #2 -----
+self = 0xfffffffffffe6820
+addr = 81080
+permission = os::mm::page_table::PTEFlags {bits: 4}
+#0  os::mm::page_table::PageTable::translate_user (self=0xfffffffffffe6820, addr=81080, permission=...) at src/mm/page_table.rs:163
+#1  0x0000000080218852 in os::syscall::process::sys_get_time (ts=0x13cb8, _tz=0) at src/syscall/process.rs:45
+#2  0x00000000802166a8 in os::syscall::syscall (syscall_id=169, args=...) at src/syscall/mod.rs:43
+#3  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+#4  0x0000000000003090 in ?? ()
+
+----- [7] translate_user #3 -----
+self = 0xfffffffffffe3820
+addr = 80360
+permission = os::mm::page_table::PTEFlags {bits: 4}
+#0  os::mm::page_table::PageTable::translate_user (self=0xfffffffffffe3820, addr=80360, permission=...) at src/mm/page_table.rs:163
+#1  0x0000000080218852 in os::syscall::process::sys_get_time (ts=0x139e8, _tz=0) at src/syscall/process.rs:45
+#2  0x00000000802166a8 in os::syscall::syscall (syscall_id=169, args=...) at src/syscall/mod.rs:43
+#3  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+#4  0x0000000000003784 in ?? ()
+
+===== [4] sys_mmap #1 =====
+start = 268435456
+len = 4096
+prot = 3
+#0  os::syscall::process::sys_mmap (start=268435456, len=4096, prot=3) at src/syscall/process.rs:100
+#1  0x00000000802166d8 in os::syscall::syscall (syscall_id=222, args=...) at src/syscall/mod.rs:45
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [4] sys_mmap #2 =====
+start = 268435456
+len = 4096
+prot = 3
+#0  os::syscall::process::sys_mmap (start=268435456, len=4096, prot=3) at src/syscall/process.rs:100
+#1  0x00000000802166d8 in os::syscall::syscall (syscall_id=222, args=...) at src/syscall/mod.rs:45
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [4] sys_mmap #3 =====
+start = 268435456
+len = 4096
+prot = 1
+#0  os::syscall::process::sys_mmap (start=268435456, len=4096, prot=1) at src/syscall/process.rs:100
+#1  0x00000000802166d8 in os::syscall::syscall (syscall_id=222, args=...) at src/syscall/mod.rs:45
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [4] sys_mmap #4 =====
+start = 268435456
+len = 4096
+prot = 1
+#0  os::syscall::process::sys_mmap (start=268435456, len=4096, prot=1) at src/syscall/process.rs:100
+#1  0x00000000802166d8 in os::syscall::syscall (syscall_id=222, args=...) at src/syscall/mod.rs:45
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [7] sys_trace #1 =====
+trace_request = 0
+id = 80343
+data = 0
+#0  os::syscall::process::sys_trace (trace_request=0, id=80343, data=0) at src/syscall/process.rs:70
+#1  0x00000000802166c0 in os::syscall::syscall (syscall_id=410, args=...) at src/syscall/mod.rs:44
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [7] sys_trace #2 =====
+trace_request = 0
+id = 80343
+data = 0
+#0  os::syscall::process::sys_trace (trace_request=0, id=80343, data=0) at src/syscall/process.rs:70
+#1  0x00000000802166c0 in os::syscall::syscall (syscall_id=410, args=...) at src/syscall/mod.rs:44
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+----- [7] translate_user #4 -----
+self = 0xfffffffffffcb970
+addr = 80343
+permission = os::mm::page_table::PTEFlags {bits: 2}
+#0  os::mm::page_table::PageTable::translate_user (self=0xfffffffffffcb970, addr=80343, permission=...) at src/mm/page_table.rs:163
+#1  0x0000000080218be2 in os::syscall::process::sys_trace (trace_request=0, id=80343, data=0) at src/syscall/process.rs:80
+#2  0x00000000802166c0 in os::syscall::syscall (syscall_id=410, args=...) at src/syscall/mod.rs:44
+#3  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+#4  0x0000000000003598 in ?? ()
+
+===== [7] sys_trace #3 =====
+trace_request = 0
+id = 80343
+data = 0
+#0  os::syscall::process::sys_trace (trace_request=0, id=80343, data=0) at src/syscall/process.rs:70
+#1  0x00000000802166c0 in os::syscall::syscall (syscall_id=410, args=...) at src/syscall/mod.rs:44
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [7] sys_trace #4 =====
+trace_request = 0
+id = 80343
+data = 0
+#0  os::syscall::process::sys_trace (trace_request=0, id=80343, data=0) at src/syscall/process.rs:70
+#1  0x00000000802166c0 in os::syscall::syscall (syscall_id=410, args=...) at src/syscall/mod.rs:44
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+----- [7] translate_user #5 -----
+self = 0xfffffffffffcb970
+addr = 80343
+permission = os::mm::page_table::PTEFlags {bits: 2}
+#0  os::mm::page_table::PageTable::translate_user (self=0xfffffffffffcb970, addr=80343, permission=...) at src/mm/page_table.rs:163
+#1  0x0000000080218be2 in os::syscall::process::sys_trace (trace_request=0, id=80343, data=0) at src/syscall/process.rs:80
+#2  0x00000000802166c0 in os::syscall::syscall (syscall_id=410, args=...) at src/syscall/mod.rs:44
+#3  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+#4  0x0000000000003598 in ?? ()
+
+===== [5] sys_munmap =====
+start = 268435456
+len = 4097
+#0  os::syscall::process::sys_munmap (start=268435456, len=4097) at src/syscall/process.rs:129
+#1  0x00000000802166ee in os::syscall::syscall (syscall_id=215, args=...) at src/syscall/mod.rs:46
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [5] sys_munmap =====
+start = 268435456
+len = 4097
+#0  os::syscall::process::sys_munmap (start=268435456, len=4097) at src/syscall/process.rs:129
+#1  0x00000000802166ee in os::syscall::syscall (syscall_id=215, args=...) at src/syscall/mod.rs:46
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [5] sys_munmap =====
+start = 268435457
+len = 4095
+#0  os::syscall::process::sys_munmap (start=268435457, len=4095) at src/syscall/process.rs:129
+#1  0x00000000802166ee in os::syscall::syscall (syscall_id=215, args=...) at src/syscall/mod.rs:46
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [5] sys_munmap =====
+start = 268435457
+len = 4095
+#0  os::syscall::process::sys_munmap (start=268435457, len=4095) at src/syscall/process.rs:129
+#1  0x00000000802166ee in os::syscall::syscall (syscall_id=215, args=...) at src/syscall/mod.rs:46
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+----- [7] translate_user #6 -----
+self = 0xfffffffffffe9820
+addr = 81288
+permission = os::mm::page_table::PTEFlags {bits: 4}
+#0  os::mm::page_table::PageTable::translate_user (self=0xfffffffffffe9820, addr=81288, permission=...) at src/mm/page_table.rs:163
+#1  0x0000000080218852 in os::syscall::process::sys_get_time (ts=0x13d88, _tz=0) at src/syscall/process.rs:45
+#2  0x00000000802166a8 in os::syscall::syscall (syscall_id=169, args=...) at src/syscall/mod.rs:43
+#3  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+#4  0x0000000000002ffa in ?? ()
+
+----- [7] translate_user #7 -----
+self = 0xfffffffffffe6820
+addr = 81016
+permission = os::mm::page_table::PTEFlags {bits: 4}
+#0  os::mm::page_table::PageTable::translate_user (self=0xfffffffffffe6820, addr=81016, permission=...) at src/mm/page_table.rs:163
+#1  0x0000000080218852 in os::syscall::process::sys_get_time (ts=0x13c78, _tz=0) at src/syscall/process.rs:45
+#2  0x00000000802166a8 in os::syscall::syscall (syscall_id=169, args=...) at src/syscall/mod.rs:43
+#3  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+#4  0x0000000000003090 in ?? ()
+
+----- [7] translate_user #8 -----
+self = 0xfffffffffffe3820
+addr = 80360
+permission = os::mm::page_table::PTEFlags {bits: 4}
+#0  os::mm::page_table::PageTable::translate_user (self=0xfffffffffffe3820, addr=80360, permission=...) at src/mm/page_table.rs:163
+#1  0x0000000080218852 in os::syscall::process::sys_get_time (ts=0x139e8, _tz=0) at src/syscall/process.rs:45
+#2  0x00000000802166a8 in os::syscall::syscall (syscall_id=169, args=...) at src/syscall/mod.rs:43
+#3  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+#4  0x0000000000003784 in ?? ()
+
+===== [7] sys_trace #5 =====
+trace_request = 1
+id = 80343
+data = 33
+#0  os::syscall::process::sys_trace (trace_request=1, id=80343, data=33) at src/syscall/process.rs:70
+#1  0x00000000802166c0 in os::syscall::syscall (syscall_id=410, args=...) at src/syscall/mod.rs:44
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [7] sys_trace #6 =====
+trace_request = 1
+id = 80343
+data = 33
+#0  os::syscall::process::sys_trace (trace_request=1, id=80343, data=33) at src/syscall/process.rs:70
+#1  0x00000000802166c0 in os::syscall::syscall (syscall_id=410, args=...) at src/syscall/mod.rs:44
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [7] sys_trace #7 =====
+trace_request = 0
+id = 9223372036854775807
+data = 0
+#0  os::syscall::process::sys_trace (trace_request=0, id=9223372036854775807, data=0) at src/syscall/process.rs:70
+#1  0x00000000802166c0 in os::syscall::syscall (syscall_id=410, args=...) at src/syscall/mod.rs:44
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [7] sys_trace #8 =====
+trace_request = 0
+id = 9223372036854775807
+data = 0
+#0  os::syscall::process::sys_trace (trace_request=0, id=9223372036854775807, data=0) at src/syscall/process.rs:70
+#1  0x00000000802166c0 in os::syscall::syscall (syscall_id=410, args=...) at src/syscall/mod.rs:44
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [5] sys_munmap =====
+start = 268435456
+len = 4096
+#0  os::syscall::process::sys_munmap (start=268435456, len=4096) at src/syscall/process.rs:129
+#1  0x00000000802166ee in os::syscall::syscall (syscall_id=215, args=...) at src/syscall/mod.rs:46
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [5] sys_munmap =====
+start = 268435456
+len = 4096
+#0  os::syscall::process::sys_munmap (start=268435456, len=4096) at src/syscall/process.rs:129
+#1  0x00000000802166ee in os::syscall::syscall (syscall_id=215, args=...) at src/syscall/mod.rs:46
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+----- [5] remove_framed_area -----
+self = 0x808d27e0 <os::mm::heap_allocator::HEAP_SPACE+165784>
+start = os::mm::address::VirtPageNum (65536)
+end = os::mm::address::VirtPageNum (65537)
+#0  os::mm::memory_set::MemorySet::remove_framed_area (self=0x808d27e0 <os::mm::heap_allocator::HEAP_SPACE+165784>, start=..., end=...) at src/mm/memory_set.rs:284
+#1  0x000000008020ed6a in os::task::task::TaskControlBlock::munmap (self=0x808d27e0 <os::mm::heap_allocator::HEAP_SPACE+165784>, start=..., end=...) at src/task/task.rs:106
+#2  0x0000000080215fba in os::task::TaskManager::munmap_current (self=0x808aa010 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>, start=..., end=...) at src/task/mod.rs:146
+#3  0x0000000080216500 in os::task::munmap_current_task (start=..., end=...) at src/task/mod.rs:248
+
+----- [5] remove_framed_area -----
+area = 0x828a2800 <os::mm::heap_allocator::HEAP_SPACE+33523640>
+#0  os::mm::memory_set::{impl#0}::remove_framed_area::{closure#0} (area=0x828a2800 <os::mm::heap_allocator::HEAP_SPACE+33523640>) at src/mm/memory_set.rs:285
+#1  0x000000008021ba64 in core::slice::iter::{impl#181}::position<os::mm::memory_set::MapArea, os::mm::memory_set::{impl#0}::remove_framed_area::{closure_env#0}> (self=0xfffffffffffc87a0, predicate=...) at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/slice/iter/macros.rs:336
+#2  0x000000008020cada in os::mm::memory_set::MemorySet::remove_framed_area (self=0x808d27e0 <os::mm::heap_allocator::HEAP_SPACE+165784>, start=..., end=...) at src/mm/memory_set.rs:284
+#3  0x000000008020ed6a in os::task::task::TaskControlBlock::munmap (self=0x808d27e0 <os::mm::heap_allocator::HEAP_SPACE+165784>, start=..., end=...) at src/task/task.rs:106
+
+----- [5] remove_framed_area -----
+area = 0x828a2830 <os::mm::heap_allocator::HEAP_SPACE+33523688>
+#0  os::mm::memory_set::{impl#0}::remove_framed_area::{closure#0} (area=0x828a2830 <os::mm::heap_allocator::HEAP_SPACE+33523688>) at src/mm/memory_set.rs:285
+#1  0x000000008021ba64 in core::slice::iter::{impl#181}::position<os::mm::memory_set::MapArea, os::mm::memory_set::{impl#0}::remove_framed_area::{closure_env#0}> (self=0xfffffffffffc87a0, predicate=...) at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/slice/iter/macros.rs:336
+#2  0x000000008020cada in os::mm::memory_set::MemorySet::remove_framed_area (self=0x808d27e0 <os::mm::heap_allocator::HEAP_SPACE+165784>, start=..., end=...) at src/mm/memory_set.rs:284
+#3  0x000000008020ed6a in os::task::task::TaskControlBlock::munmap (self=0x808d27e0 <os::mm::heap_allocator::HEAP_SPACE+165784>, start=..., end=...) at src/task/task.rs:106
+
+----- [5] remove_framed_area -----
+area = 0x828a2860 <os::mm::heap_allocator::HEAP_SPACE+33523736>
+#0  os::mm::memory_set::{impl#0}::remove_framed_area::{closure#0} (area=0x828a2860 <os::mm::heap_allocator::HEAP_SPACE+33523736>) at src/mm/memory_set.rs:285
+#1  0x000000008021ba64 in core::slice::iter::{impl#181}::position<os::mm::memory_set::MapArea, os::mm::memory_set::{impl#0}::remove_framed_area::{closure_env#0}> (self=0xfffffffffffc87a0, predicate=...) at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/slice/iter/macros.rs:336
+#2  0x000000008020cada in os::mm::memory_set::MemorySet::remove_framed_area (self=0x808d27e0 <os::mm::heap_allocator::HEAP_SPACE+165784>, start=..., end=...) at src/mm/memory_set.rs:284
+#3  0x000000008020ed6a in os::task::task::TaskControlBlock::munmap (self=0x808d27e0 <os::mm::heap_allocator::HEAP_SPACE+165784>, start=..., end=...) at src/task/task.rs:106
+
+----- [5] remove_framed_area -----
+area = 0x828a2890 <os::mm::heap_allocator::HEAP_SPACE+33523784>
+#0  os::mm::memory_set::{impl#0}::remove_framed_area::{closure#0} (area=0x828a2890 <os::mm::heap_allocator::HEAP_SPACE+33523784>) at src/mm/memory_set.rs:285
+#1  0x000000008021ba64 in core::slice::iter::{impl#181}::position<os::mm::memory_set::MapArea, os::mm::memory_set::{impl#0}::remove_framed_area::{closure_env#0}> (self=0xfffffffffffc87a0, predicate=...) at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/slice/iter/macros.rs:336
+#2  0x000000008020cada in os::mm::memory_set::MemorySet::remove_framed_area (self=0x808d27e0 <os::mm::heap_allocator::HEAP_SPACE+165784>, start=..., end=...) at src/mm/memory_set.rs:284
+#3  0x000000008020ed6a in os::task::task::TaskControlBlock::munmap (self=0x808d27e0 <os::mm::heap_allocator::HEAP_SPACE+165784>, start=..., end=...) at src/task/task.rs:106
+
+----- [5] remove_framed_area -----
+area = 0x828a28c0 <os::mm::heap_allocator::HEAP_SPACE+33523832>
+#0  os::mm::memory_set::{impl#0}::remove_framed_area::{closure#0} (area=0x828a28c0 <os::mm::heap_allocator::HEAP_SPACE+33523832>) at src/mm/memory_set.rs:285
+#1  0x000000008021ba64 in core::slice::iter::{impl#181}::position<os::mm::memory_set::MapArea, os::mm::memory_set::{impl#0}::remove_framed_area::{closure_env#0}> (self=0xfffffffffffc87a0, predicate=...) at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/slice/iter/macros.rs:336
+#2  0x000000008020cada in os::mm::memory_set::MemorySet::remove_framed_area (self=0x808d27e0 <os::mm::heap_allocator::HEAP_SPACE+165784>, start=..., end=...) at src/mm/memory_set.rs:284
+#3  0x000000008020ed6a in os::task::task::TaskControlBlock::munmap (self=0x808d27e0 <os::mm::heap_allocator::HEAP_SPACE+165784>, start=..., end=...) at src/task/task.rs:106
+
+----- [5] remove_framed_area -----
+area = 0x828a28f0 <os::mm::heap_allocator::HEAP_SPACE+33523880>
+#0  os::mm::memory_set::{impl#0}::remove_framed_area::{closure#0} (area=0x828a28f0 <os::mm::heap_allocator::HEAP_SPACE+33523880>) at src/mm/memory_set.rs:285
+#1  0x000000008021ba64 in core::slice::iter::{impl#181}::position<os::mm::memory_set::MapArea, os::mm::memory_set::{impl#0}::remove_framed_area::{closure_env#0}> (self=0xfffffffffffc87a0, predicate=...) at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/slice/iter/macros.rs:336
+#2  0x000000008020cada in os::mm::memory_set::MemorySet::remove_framed_area (self=0x808d27e0 <os::mm::heap_allocator::HEAP_SPACE+165784>, start=..., end=...) at src/mm/memory_set.rs:284
+#3  0x000000008020ed6a in os::task::task::TaskControlBlock::munmap (self=0x808d27e0 <os::mm::heap_allocator::HEAP_SPACE+165784>, start=..., end=...) at src/task/task.rs:106
+
+----- [5] remove_framed_area -----
+area = 0x828a2920 <os::mm::heap_allocator::HEAP_SPACE+33523928>
+#0  os::mm::memory_set::{impl#0}::remove_framed_area::{closure#0} (area=0x828a2920 <os::mm::heap_allocator::HEAP_SPACE+33523928>) at src/mm/memory_set.rs:285
+#1  0x000000008021ba64 in core::slice::iter::{impl#181}::position<os::mm::memory_set::MapArea, os::mm::memory_set::{impl#0}::remove_framed_area::{closure_env#0}> (self=0xfffffffffffc87a0, predicate=...) at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/slice/iter/macros.rs:336
+#2  0x000000008020cada in os::mm::memory_set::MemorySet::remove_framed_area (self=0x808d27e0 <os::mm::heap_allocator::HEAP_SPACE+165784>, start=..., end=...) at src/mm/memory_set.rs:284
+#3  0x000000008020ed6a in os::task::task::TaskControlBlock::munmap (self=0x808d27e0 <os::mm::heap_allocator::HEAP_SPACE+165784>, start=..., end=...) at src/task/task.rs:106
+
+===== [6] sys_sbrk =====
+size = 0
+#0  os::syscall::process::sys_sbrk (size=0) at src/syscall/process.rs:145
+#1  0x0000000080216702 in os::syscall::syscall (syscall_id=214, args=...) at src/syscall/mod.rs:47
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [6] sys_sbrk =====
+size = 0
+#0  os::syscall::process::sys_sbrk (size=0) at src/syscall/process.rs:145
+#1  0x0000000080216702 in os::syscall::syscall (syscall_id=214, args=...) at src/syscall/mod.rs:47
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+----- [6] MemorySet::append_to -----
+self = 0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>
+start = os::mm::address::VirtAddr (81920)
+new_end = os::mm::address::VirtAddr (81920)
+#0  os::mm::memory_set::MemorySet::append_to (self=0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>, start=..., new_end=...) at src/mm/memory_set.rs:311
+#1  0x000000008020ee20 in os::task::task::TaskControlBlock::change_program_brk (self=0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>, size=0) at src/task/task.rs:120
+#2  0x0000000080216046 in os::task::TaskManager::change_current_program_brk (self=0x808aa010 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>, size=0) at src/task/mod.rs:153
+#3  0x0000000080216534 in os::task::change_program_brk (size=0) at src/task/mod.rs:253
+
+===== [5] sys_munmap =====
+start = 268435456
+len = 4096
+#0  os::syscall::process::sys_munmap (start=268435456, len=4096) at src/syscall/process.rs:129
+#1  0x00000000802166ee in os::syscall::syscall (syscall_id=215, args=...) at src/syscall/mod.rs:46
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [5] sys_munmap =====
+start = 268435456
+len = 4096
+#0  os::syscall::process::sys_munmap (start=268435456, len=4096) at src/syscall/process.rs:129
+#1  0x00000000802166ee in os::syscall::syscall (syscall_id=215, args=...) at src/syscall/mod.rs:46
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+----- [5] remove_framed_area -----
+self = 0x808d1770 <os::mm::heap_allocator::HEAP_SPACE+161576>
+start = os::mm::address::VirtPageNum (65536)
+end = os::mm::address::VirtPageNum (65537)
+#0  os::mm::memory_set::MemorySet::remove_framed_area (self=0x808d1770 <os::mm::heap_allocator::HEAP_SPACE+161576>, start=..., end=...) at src/mm/memory_set.rs:284
+#1  0x000000008020ed6a in os::task::task::TaskControlBlock::munmap (self=0x808d1770 <os::mm::heap_allocator::HEAP_SPACE+161576>, start=..., end=...) at src/task/task.rs:106
+#2  0x0000000080215fba in os::task::TaskManager::munmap_current (self=0x808aa010 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>, start=..., end=...) at src/task/mod.rs:146
+#3  0x0000000080216500 in os::task::munmap_current_task (start=..., end=...) at src/task/mod.rs:248
+
+----- [5] remove_framed_area -----
+area = 0x828a2000 <os::mm::heap_allocator::HEAP_SPACE+33521592>
+#0  os::mm::memory_set::{impl#0}::remove_framed_area::{closure#0} (area=0x828a2000 <os::mm::heap_allocator::HEAP_SPACE+33521592>) at src/mm/memory_set.rs:285
+#1  0x000000008021ba64 in core::slice::iter::{impl#181}::position<os::mm::memory_set::MapArea, os::mm::memory_set::{impl#0}::remove_framed_area::{closure_env#0}> (self=0xfffffffffffcb7a0, predicate=...) at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/slice/iter/macros.rs:336
+#2  0x000000008020cada in os::mm::memory_set::MemorySet::remove_framed_area (self=0x808d1770 <os::mm::heap_allocator::HEAP_SPACE+161576>, start=..., end=...) at src/mm/memory_set.rs:284
+#3  0x000000008020ed6a in os::task::task::TaskControlBlock::munmap (self=0x808d1770 <os::mm::heap_allocator::HEAP_SPACE+161576>, start=..., end=...) at src/task/task.rs:106
+
+----- [5] remove_framed_area -----
+area = 0x828a2030 <os::mm::heap_allocator::HEAP_SPACE+33521640>
+#0  os::mm::memory_set::{impl#0}::remove_framed_area::{closure#0} (area=0x828a2030 <os::mm::heap_allocator::HEAP_SPACE+33521640>) at src/mm/memory_set.rs:285
+#1  0x000000008021ba64 in core::slice::iter::{impl#181}::position<os::mm::memory_set::MapArea, os::mm::memory_set::{impl#0}::remove_framed_area::{closure_env#0}> (self=0xfffffffffffcb7a0, predicate=...) at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/slice/iter/macros.rs:336
+#2  0x000000008020cada in os::mm::memory_set::MemorySet::remove_framed_area (self=0x808d1770 <os::mm::heap_allocator::HEAP_SPACE+161576>, start=..., end=...) at src/mm/memory_set.rs:284
+#3  0x000000008020ed6a in os::task::task::TaskControlBlock::munmap (self=0x808d1770 <os::mm::heap_allocator::HEAP_SPACE+161576>, start=..., end=...) at src/task/task.rs:106
+
+----- [5] remove_framed_area -----
+area = 0x828a2060 <os::mm::heap_allocator::HEAP_SPACE+33521688>
+#0  os::mm::memory_set::{impl#0}::remove_framed_area::{closure#0} (area=0x828a2060 <os::mm::heap_allocator::HEAP_SPACE+33521688>) at src/mm/memory_set.rs:285
+#1  0x000000008021ba64 in core::slice::iter::{impl#181}::position<os::mm::memory_set::MapArea, os::mm::memory_set::{impl#0}::remove_framed_area::{closure_env#0}> (self=0xfffffffffffcb7a0, predicate=...) at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/slice/iter/macros.rs:336
+#2  0x000000008020cada in os::mm::memory_set::MemorySet::remove_framed_area (self=0x808d1770 <os::mm::heap_allocator::HEAP_SPACE+161576>, start=..., end=...) at src/mm/memory_set.rs:284
+#3  0x000000008020ed6a in os::task::task::TaskControlBlock::munmap (self=0x808d1770 <os::mm::heap_allocator::HEAP_SPACE+161576>, start=..., end=...) at src/task/task.rs:106
+
+----- [5] remove_framed_area -----
+area = 0x828a2090 <os::mm::heap_allocator::HEAP_SPACE+33521736>
+#0  os::mm::memory_set::{impl#0}::remove_framed_area::{closure#0} (area=0x828a2090 <os::mm::heap_allocator::HEAP_SPACE+33521736>) at src/mm/memory_set.rs:285
+#1  0x000000008021ba64 in core::slice::iter::{impl#181}::position<os::mm::memory_set::MapArea, os::mm::memory_set::{impl#0}::remove_framed_area::{closure_env#0}> (self=0xfffffffffffcb7a0, predicate=...) at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/slice/iter/macros.rs:336
+#2  0x000000008020cada in os::mm::memory_set::MemorySet::remove_framed_area (self=0x808d1770 <os::mm::heap_allocator::HEAP_SPACE+161576>, start=..., end=...) at src/mm/memory_set.rs:284
+#3  0x000000008020ed6a in os::task::task::TaskControlBlock::munmap (self=0x808d1770 <os::mm::heap_allocator::HEAP_SPACE+161576>, start=..., end=...) at src/task/task.rs:106
+
+----- [5] remove_framed_area -----
+area = 0x828a20c0 <os::mm::heap_allocator::HEAP_SPACE+33521784>
+#0  os::mm::memory_set::{impl#0}::remove_framed_area::{closure#0} (area=0x828a20c0 <os::mm::heap_allocator::HEAP_SPACE+33521784>) at src/mm/memory_set.rs:285
+#1  0x000000008021ba64 in core::slice::iter::{impl#181}::position<os::mm::memory_set::MapArea, os::mm::memory_set::{impl#0}::remove_framed_area::{closure_env#0}> (self=0xfffffffffffcb7a0, predicate=...) at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/slice/iter/macros.rs:336
+#2  0x000000008020cada in os::mm::memory_set::MemorySet::remove_framed_area (self=0x808d1770 <os::mm::heap_allocator::HEAP_SPACE+161576>, start=..., end=...) at src/mm/memory_set.rs:284
+#3  0x000000008020ed6a in os::task::task::TaskControlBlock::munmap (self=0x808d1770 <os::mm::heap_allocator::HEAP_SPACE+161576>, start=..., end=...) at src/task/task.rs:106
+
+----- [5] remove_framed_area -----
+area = 0x828a20f0 <os::mm::heap_allocator::HEAP_SPACE+33521832>
+#0  os::mm::memory_set::{impl#0}::remove_framed_area::{closure#0} (area=0x828a20f0 <os::mm::heap_allocator::HEAP_SPACE+33521832>) at src/mm/memory_set.rs:285
+#1  0x000000008021ba64 in core::slice::iter::{impl#181}::position<os::mm::memory_set::MapArea, os::mm::memory_set::{impl#0}::remove_framed_area::{closure_env#0}> (self=0xfffffffffffcb7a0, predicate=...) at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/slice/iter/macros.rs:336
+#2  0x000000008020cada in os::mm::memory_set::MemorySet::remove_framed_area (self=0x808d1770 <os::mm::heap_allocator::HEAP_SPACE+161576>, start=..., end=...) at src/mm/memory_set.rs:284
+#3  0x000000008020ed6a in os::task::task::TaskControlBlock::munmap (self=0x808d1770 <os::mm::heap_allocator::HEAP_SPACE+161576>, start=..., end=...) at src/task/task.rs:106
+
+----- [5] remove_framed_area -----
+area = 0x828a2120 <os::mm::heap_allocator::HEAP_SPACE+33521880>
+#0  os::mm::memory_set::{impl#0}::remove_framed_area::{closure#0} (area=0x828a2120 <os::mm::heap_allocator::HEAP_SPACE+33521880>) at src/mm/memory_set.rs:285
+#1  0x000000008021ba64 in core::slice::iter::{impl#181}::position<os::mm::memory_set::MapArea, os::mm::memory_set::{impl#0}::remove_framed_area::{closure_env#0}> (self=0xfffffffffffcb7a0, predicate=...) at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/slice/iter/macros.rs:336
+#2  0x000000008020cada in os::mm::memory_set::MemorySet::remove_framed_area (self=0x808d1770 <os::mm::heap_allocator::HEAP_SPACE+161576>, start=..., end=...) at src/mm/memory_set.rs:284
+#3  0x000000008020ed6a in os::task::task::TaskControlBlock::munmap (self=0x808d1770 <os::mm::heap_allocator::HEAP_SPACE+161576>, start=..., end=...) at src/task/task.rs:106
+
+===== [6] sys_sbrk =====
+size = 4096
+#0  os::syscall::process::sys_sbrk (size=4096) at src/syscall/process.rs:145
+#1  0x0000000080216702 in os::syscall::syscall (syscall_id=214, args=...) at src/syscall/mod.rs:47
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [6] sys_sbrk =====
+size = 4096
+#0  os::syscall::process::sys_sbrk (size=4096) at src/syscall/process.rs:145
+#1  0x0000000080216702 in os::syscall::syscall (syscall_id=214, args=...) at src/syscall/mod.rs:47
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+----- [6] MemorySet::append_to -----
+self = 0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>
+start = os::mm::address::VirtAddr (81920)
+new_end = os::mm::address::VirtAddr (86016)
+#0  os::mm::memory_set::MemorySet::append_to (self=0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>, start=..., new_end=...) at src/mm/memory_set.rs:311
+#1  0x000000008020ee20 in os::task::task::TaskControlBlock::change_program_brk (self=0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>, size=4096) at src/task/task.rs:120
+#2  0x0000000080216046 in os::task::TaskManager::change_current_program_brk (self=0x808aa010 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>, size=4096) at src/task/mod.rs:153
+#3  0x0000000080216534 in os::task::change_program_brk (size=4096) at src/task/mod.rs:253
+
+===== [6] sys_sbrk =====
+size = 0
+#0  os::syscall::process::sys_sbrk (size=0) at src/syscall/process.rs:145
+#1  0x0000000080216702 in os::syscall::syscall (syscall_id=214, args=...) at src/syscall/mod.rs:47
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [6] sys_sbrk =====
+size = 0
+#0  os::syscall::process::sys_sbrk (size=0) at src/syscall/process.rs:145
+#1  0x0000000080216702 in os::syscall::syscall (syscall_id=214, args=...) at src/syscall/mod.rs:47
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+----- [6] MemorySet::append_to -----
+self = 0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>
+start = os::mm::address::VirtAddr (81920)
+new_end = os::mm::address::VirtAddr (86016)
+#0  os::mm::memory_set::MemorySet::append_to (self=0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>, start=..., new_end=...) at src/mm/memory_set.rs:311
+#1  0x000000008020ee20 in os::task::task::TaskControlBlock::change_program_brk (self=0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>, size=0) at src/task/task.rs:120
+#2  0x0000000080216046 in os::task::TaskManager::change_current_program_brk (self=0x808aa010 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>, size=0) at src/task/mod.rs:153
+#3  0x0000000080216534 in os::task::change_program_brk (size=0) at src/task/mod.rs:253
+
+===== [6] sys_sbrk =====
+size = 40960
+#0  os::syscall::process::sys_sbrk (size=40960) at src/syscall/process.rs:145
+#1  0x0000000080216702 in os::syscall::syscall (syscall_id=214, args=...) at src/syscall/mod.rs:47
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [6] sys_sbrk =====
+size = 40960
+#0  os::syscall::process::sys_sbrk (size=40960) at src/syscall/process.rs:145
+#1  0x0000000080216702 in os::syscall::syscall (syscall_id=214, args=...) at src/syscall/mod.rs:47
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+----- [6] MemorySet::append_to -----
+self = 0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>
+start = os::mm::address::VirtAddr (81920)
+new_end = os::mm::address::VirtAddr (126976)
+#0  os::mm::memory_set::MemorySet::append_to (self=0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>, start=..., new_end=...) at src/mm/memory_set.rs:311
+#1  0x000000008020ee20 in os::task::task::TaskControlBlock::change_program_brk (self=0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>, size=40960) at src/task/task.rs:120
+#2  0x0000000080216046 in os::task::TaskManager::change_current_program_brk (self=0x808aa010 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>, size=40960) at src/task/mod.rs:153
+#3  0x0000000080216534 in os::task::change_program_brk (size=40960) at src/task/mod.rs:253
+
+===== [6] sys_sbrk =====
+size = 0
+#0  os::syscall::process::sys_sbrk (size=0) at src/syscall/process.rs:145
+#1  0x0000000080216702 in os::syscall::syscall (syscall_id=214, args=...) at src/syscall/mod.rs:47
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [6] sys_sbrk =====
+size = 0
+#0  os::syscall::process::sys_sbrk (size=0) at src/syscall/process.rs:145
+#1  0x0000000080216702 in os::syscall::syscall (syscall_id=214, args=...) at src/syscall/mod.rs:47
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+----- [6] MemorySet::append_to -----
+self = 0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>
+start = os::mm::address::VirtAddr (81920)
+new_end = os::mm::address::VirtAddr (126976)
+#0  os::mm::memory_set::MemorySet::append_to (self=0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>, start=..., new_end=...) at src/mm/memory_set.rs:311
+#1  0x000000008020ee20 in os::task::task::TaskControlBlock::change_program_brk (self=0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>, size=0) at src/task/task.rs:120
+#2  0x0000000080216046 in os::task::TaskManager::change_current_program_brk (self=0x808aa010 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>, size=0) at src/task/mod.rs:153
+#3  0x0000000080216534 in os::task::change_program_brk (size=0) at src/task/mod.rs:253
+
+===== [6] sys_sbrk =====
+size = -45056
+#0  os::syscall::process::sys_sbrk (size=-45056) at src/syscall/process.rs:145
+#1  0x0000000080216702 in os::syscall::syscall (syscall_id=214, args=...) at src/syscall/mod.rs:47
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [6] sys_sbrk =====
+size = -45056
+#0  os::syscall::process::sys_sbrk (size=-45056) at src/syscall/process.rs:145
+#1  0x0000000080216702 in os::syscall::syscall (syscall_id=214, args=...) at src/syscall/mod.rs:47
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+----- [6] MemorySet::shrink_to -----
+self = 0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>
+start = os::mm::address::VirtAddr (81920)
+new_end = os::mm::address::VirtAddr (81920)
+#0  os::mm::memory_set::MemorySet::shrink_to (self=0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>, start=..., new_end=...) at src/mm/memory_set.rs:296
+#1  0x000000008020ee48 in os::task::task::TaskControlBlock::change_program_brk (self=0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>, size=-45056) at src/task/task.rs:117
+#2  0x0000000080216046 in os::task::TaskManager::change_current_program_brk (self=0x808aa010 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>, size=-45056) at src/task/mod.rs:153
+#3  0x0000000080216534 in os::task::change_program_brk (size=-45056) at src/task/mod.rs:253
+
+----- [6] MemorySet::shrink_to -----
+self = 0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>
+start = os::mm::address::VirtAddr (81920)
+new_end = os::mm::address::VirtAddr (81920)
+#0  os::mm::memory_set::MemorySet::shrink_to (self=0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>, start=..., new_end=...) at src/mm/memory_set.rs:296
+#1  0x000000008020ee48 in os::task::task::TaskControlBlock::change_program_brk (self=0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>, size=-45056) at src/task/task.rs:117
+#2  0x0000000080216046 in os::task::TaskManager::change_current_program_brk (self=0x808aa010 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>, size=-45056) at src/task/mod.rs:153
+#3  0x0000000080216534 in os::task::change_program_brk (size=-45056) at src/task/mod.rs:253
+
+===== [6] sys_sbrk =====
+size = 0
+#0  os::syscall::process::sys_sbrk (size=0) at src/syscall/process.rs:145
+#1  0x0000000080216702 in os::syscall::syscall (syscall_id=214, args=...) at src/syscall/mod.rs:47
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [6] sys_sbrk =====
+size = 0
+#0  os::syscall::process::sys_sbrk (size=0) at src/syscall/process.rs:145
+#1  0x0000000080216702 in os::syscall::syscall (syscall_id=214, args=...) at src/syscall/mod.rs:47
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+----- [6] MemorySet::append_to -----
+self = 0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>
+start = os::mm::address::VirtAddr (81920)
+new_end = os::mm::address::VirtAddr (81920)
+#0  os::mm::memory_set::MemorySet::append_to (self=0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>, start=..., new_end=...) at src/mm/memory_set.rs:311
+#1  0x000000008020ee20 in os::task::task::TaskControlBlock::change_program_brk (self=0x808d48c0 <os::mm::heap_allocator::HEAP_SPACE+174200>, size=0) at src/task/task.rs:120
+#2  0x0000000080216046 in os::task::TaskManager::change_current_program_brk (self=0x808aa010 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>, size=0) at src/task/mod.rs:153
+#3  0x0000000080216534 in os::task::change_program_brk (size=0) at src/task/mod.rs:253
+
+===== [6] sys_sbrk =====
+size = -4096
+#0  os::syscall::process::sys_sbrk (size=-4096) at src/syscall/process.rs:145
+#1  0x0000000080216702 in os::syscall::syscall (syscall_id=214, args=...) at src/syscall/mod.rs:47
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== [6] sys_sbrk =====
+size = -4096
+#0  os::syscall::process::sys_sbrk (size=-4096) at src/syscall/process.rs:145
+#1  0x0000000080216702 in os::syscall::syscall (syscall_id=214, args=...) at src/syscall/mod.rs:47
+#2  0x000000008020f90a in os::trap::trap_handler () at src/trap/mod.rs:73
+
+===== end: all applications completed =====
+#0  os::task::TaskManager::run_next_task (self=0x808aa010 <<os::task::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY>) at src/task/mod.rs:173
+#1  0x0000000080216394 in os::task::run_next_task () at src/task/mod.rs:206
+#2  0x0000000080216424 in os::task::exit_current_and_run_next () at src/task/mod.rs:228
+#3  0x00000000802184a8 in os::syscall::process::sys_exit (_exit_code=0) at src/syscall/process.rs:21
+===== end of gdb session =====
+[Inferior 1 (process 1) detached]
