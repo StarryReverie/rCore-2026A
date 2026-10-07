@@ -1,0 +1,119 @@
+================================================================
+rCore ch2 GDB trace: user ecall and application exceptions
+kernel: ch2 reference (MODE=debug), apps app_0..app_6
+================================================================
+0x0000000000001000 in ?? ()
+
+
+===== [1] rust_main -> run_next_app -> load_app -> __restore =====
+Temporary breakpoint 1 at 0x80202d48: file src/batch.rs, line 70.
+
+Temporary breakpoint 1, os::batch::AppManager::load_app (self=0x80276008 <<os::batch::APP_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY+8>, app_id=0) at src/batch.rs:70
+70	        if app_id >= self.num_app {
+Warning: the current language does not match this frame.
+-- hit AppManager::load_app
+self = 0x80276008 <<os::batch::APP_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY+8>
+app_id = 0
+#0  os::batch::AppManager::load_app (self=0x80276008 <<os::batch::APP_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY+8>, app_id=0) at src/batch.rs:70
+#1  0x000000008020306a in os::batch::run_next_app () at src/batch.rs:138
+#2  0x0000000080201642 in os::rust_main () at src/main.rs:92
+#3  0x0000000080200010 in stext ()
+Backtrace stopped: frame did not save the PC
+
+-- continue to __restore (first app boot)
+Temporary breakpoint 2 at 0x802003a8
+
+Temporary breakpoint 2, 0x00000000802003a8 in __restore ()
+-- hit __restore, a0 = TrapContext pointer
+a0             0x8020cef0	2149633776
+-- TrapContext layout: x[0..31], sstatus, sepc (34 words)
+0x8020cef0 <_ZN2os5batch12KERNEL_STACK17h2b346ac64099205cE+7920>:	0x0000000000000000	0x0000000000000000
+0x8020cf00 <_ZN2os5batch12KERNEL_STACK17h2b346ac64099205cE+7936>:	0x000000008020f000	0x0000000000000000
+0x8020cf10 <_ZN2os5batch12KERNEL_STACK17h2b346ac64099205cE+7952>:	0x0000000000000000	0x0000000000000000
+0x8020cf20 <_ZN2os5batch12KERNEL_STACK17h2b346ac64099205cE+7968>:	0x0000000000000000	0x0000000000000000
+0x8020cf30 <_ZN2os5batch12KERNEL_STACK17h2b346ac64099205cE+7984>:	0x0000000000000000	0x0000000000000000
+0x8020cf40 <_ZN2os5batch12KERNEL_STACK17h2b346ac64099205cE+8000>:	0x0000000000000000	0x0000000000000000
+0x8020cf50 <_ZN2os5batch12KERNEL_STACK17h2b346ac64099205cE+8016>:	0x0000000000000000	0x0000000000000000
+0x8020cf60 <_ZN2os5batch12KERNEL_STACK17h2b346ac64099205cE+8032>:	0x0000000000000000	0x0000000000000000
+0x8020cf70 <_ZN2os5batch12KERNEL_STACK17h2b346ac64099205cE+8048>:	0x0000000000000000	0x0000000000000000
+0x8020cf80 <_ZN2os5batch12KERNEL_STACK17h2b346ac64099205cE+8064>:	0x0000000000000000	0x0000000000000000
+0x8020cf90 <_ZN2os5batch12KERNEL_STACK17h2b346ac64099205cE+8080>:	0x0000000000000000	0x0000000000000000
+0x8020cfa0 <_ZN2os5batch12KERNEL_STACK17h2b346ac64099205cE+8096>:	0x0000000000000000	0x0000000000000000
+0x8020cfb0 <_ZN2os5batch12KERNEL_STACK17h2b346ac64099205cE+8112>:	0x0000000000000000	0x0000000000000000
+0x8020cfc0 <_ZN2os5batch12KERNEL_STACK17h2b346ac64099205cE+8128>:	0x0000000000000000	0x0000000000000000
+0x8020cfd0 <_ZN2os5batch12KERNEL_STACK17h2b346ac64099205cE+8144>:	0x0000000000000000	0x0000000000000000
+0x8020cfe0 <_ZN2os5batch12KERNEL_STACK17h2b346ac64099205cE+8160>:	0x0000000000000000	0x0000000000000000
+0x8020cff0 <_ZN2os5batch12KERNEL_STACK17h2b346ac64099205cE+8176>:	0x0000000200000000	0x0000000080400000
+-- user sp is x[2] (third word):
+$1 = 0x8020f000
+
+
+===== [2] exception -> trap_handler -> run_next_app =====
+-- wait for first IllegalInstruction (scause == 2)
+Temporary breakpoint 3 at 0x80200444: file src/trap/mod.rs, line 41.
+
+Temporary breakpoint 3, os::trap::trap_handler (cx=0x8020cef0 <os::batch::KERNEL_STACK+7920>) at src/trap/mod.rs:41
+41	    let scause = scause::read(); // get trap cause
+-- hit trap_handler with scause == 2
+#0  os::trap::trap_handler (cx=0x8020cef0 <os::batch::KERNEL_STACK+7920>) at src/trap/mod.rs:41
+#1  0x00000000802003a8 in __alltraps ()
+Backtrace stopped: frame did not save the PC
+scause         0x2	2
+stval          0x0	0
+-- saved sepc of the faulting instruction:
+$2 = 0x804001fc
+
+
+===== [3] ecall -> trap_handler -> syscall -> sys_write =====
+-- wait for first write syscall (scause == 8 && a7 == 64)
+Temporary breakpoint 4 at 0x80200444: file src/trap/mod.rs, line 41.
+
+Temporary breakpoint 4, os::trap::trap_handler (cx=0x8020cef0 <os::batch::KERNEL_STACK+7920>) at src/trap/mod.rs:41
+41	    let scause = scause::read(); // get trap cause
+-- hit trap_handler for write
+saved sepc (ecall) = 0x80402d52
+syscall_id (a7)  = 64
+arg a0 (fd)      = 1
+arg a1 (buf ptr) = 0x8040d000
+arg a2 (len)     = 37
+#0  os::trap::trap_handler (cx=0x8020cef0 <os::batch::KERNEL_STACK+7920>) at src/trap/mod.rs:41
+#1  0x00000000802003a8 in __alltraps ()
+Backtrace stopped: frame did not save the PC
+
+-- continue into syscall()
+Temporary breakpoint 5 at 0x80203d98: file src/syscall/mod.rs, line 25.
+
+Temporary breakpoint 5, os::syscall::syscall (syscall_id=64, args=...) at src/syscall/mod.rs:25
+25	    match syscall_id {
+-- hit syscall(syscall_id, args)
+syscall_id = 64
+args = {1, 2151731200, 37}
+#0  os::syscall::syscall (syscall_id=64, args=...) at src/syscall/mod.rs:25
+#1  0x0000000080200750 in os::trap::trap_handler (cx=0x8020cef0 <os::batch::KERNEL_STACK+7920>) at src/trap/mod.rs:46
+#2  0x00000000802003a8 in __alltraps ()
+Backtrace stopped: frame did not save the PC
+
+-- finish syscall() then step the return-value writeback
+0x0000000080200750 in os::trap::trap_handler (cx=0x8020cef0 <os::batch::KERNEL_STACK+7920>) at src/trap/mod.rs:46
+46	            cx.x[10] = syscall(cx.x[17], [cx.x[10], cx.x[11], cx.x[12]]) as usize;
+Value returned is $3 = 37
+os::trap::trap_handler (cx=0x80410198) at src/trap/mod.rs:65
+65	}
+sepc delta after dispatch = 0x4
+return value stored in a0 = 37
+
+
+===== [4] sys_exit / remaining app loads / completion =====
+Breakpoint 6 at 0x80202d48: file src/batch.rs, line 70.
+Breakpoint 7 at 0x80205bdc: file src/syscall/process.rs, line 6.
+-- continue to the end of the batch
+[sys_exit] exit_code = 0
+[load_app] app_id = 4
+[sys_exit] exit_code = 0
+[load_app] app_id = 5
+[sys_exit] exit_code = 0
+[load_app] app_id = 6
+[sys_exit] exit_code = 0
+[load_app] app_id = 7
+../reports/ch2-gdb.cmd:99: Error in sourced command file:
+Remote connection closed
