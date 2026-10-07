@@ -1,0 +1,1 @@
+{"schema":"course-log-v1","id":"77c72b20-680a-48d0-a478-a2617c2f7737","timestamp":"2026-10-07T07:48:23.536Z","session":"","type":"ai_prompt","actor":"ai","source":"ai-adapter","prompt":"完成静态分析和gdb跟踪","tool":"pi"}
