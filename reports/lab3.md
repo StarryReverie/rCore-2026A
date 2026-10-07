@@ -414,81 +414,171 @@ dump 出现 `ra = 0x80203e14`（而不是 `__restore`），说明它此前已被
 
 ## 3. 独立实现与对比
 
-独立实现只修改一个文件、完成四处 TODO：
-[`os/src/task/mod.rs`](../os/src/task/mod.rs) 的 `TASK_MANAGER` 初始化表达式、
-`run_first_task()`、`suspend_current_and_run_next()`、`exit_current_and_run_next()`；
-`os/src/task/task.rs` 无需改动，`entry.asm` 的 64 KiB 启动栈经 release / debug 实测
-均未溢出，故未修改。
+本章的独立实现位于 `ch3-api` 分支，只修改一个文件
+[`os/src/task/mod.rs`](../os/src/task/mod.rs)，完成四处 TODO：`TASK_MANAGER` 初始化
+表达式与 `run_first_task()`、`suspend_current_and_run_next()`、`exit_current_and_run_next()`
+三个对外函数。`os/src/task/task.rs` 的数据结构未改动；64 KiB 的 `boot_stack`
+（`entry.asm`）经 release/debug 实测均未溢出，故未修改。数据结构、对外接口签名、
+已提供的系统调用计数实现均保持原样。
 
-实现组织：在 `impl TaskManager` 中新增私有方法 `run_first_task`、
-`mark_current_suspended`、`mark_current_exited`、`find_next_task`、`run_next_task`，
-三个对外函数只做薄封装。
+### 3.1 实现组织
 
-### 3.1 初始化范围（最重要的差异）
+在 `impl TaskManager` 中新增五个私有方法，三个对外函数只做薄封装：
 
-- **参考实现**：`for (i, task) in tasks.iter_mut().enumerate()` 遍历 `0..MAX_APP_NUM`
-  （16），把**所有槽位**都置为 `Ready` 并调用 `init_app_cx(i)`。GDB 实测
-  `init_app_cx` 被调用 **16** 次，而实际应用只有 13 个，即多初始化了 3 个无效槽位。
-  由于 `find_next_task` 只在 `0..num_app` 内轮转，这些多余槽位不会被调度，行为上无害。
-- **本次实现**：按接口契约只初始化 `0..num_app`：
+| 内部方法 | 职责 |
+| --- | --- |
+| `run_first_task(&self) -> !` | 启动任务 0 |
+| `mark_current_suspended(&self)` | 当前任务 `Running → Ready` |
+| `mark_current_exited(&self)` | 当前任务 `Running → Exited` |
+| `find_next_task(&self) -> Option<usize>` | 轮转选择后继 |
+| `run_next_task(&self)` | 更新状态并 `__switch` |
 
-  ```rust
-  let mut tasks = [TaskControlBlock {
-      task_status: TaskStatus::UnInit,
-      task_cx: TaskContext::zero_init(),
-      syscall_counts: [0; MAX_SYSCALL_NUM],
-  }; MAX_APP_NUM];
-  for (i, task) in tasks.iter_mut().enumerate().take(num_app) {
-      task.task_cx = TaskContext::goto_restore(init_app_cx(i));
-      task.task_status = TaskStatus::Ready;
-  }
-  ```
-
-  未使用槽位保持 `UnInit`，满足契约，也避免为不存在的应用生成上下文。
-
-### 3.2 轮转选择
-
-两者都在有效编号 `0..num_app` 内、从当前任务之后开始取模寻找第一个 `Ready`：
+对外入口保持契约规定的签名：
 
 ```rust
-(cur + 1 ..= cur + self.num_app).map(|id| id % self.num_app)
-    .find(|id| inner.tasks[*id].task_status == TaskStatus::Ready)
+pub fn run_first_task() { TASK_MANAGER.run_first_task(); }
+
+pub fn suspend_current_and_run_next() {
+    TASK_MANAGER.mark_current_suspended();
+    TASK_MANAGER.run_next_task();
+}
+
+pub fn exit_current_and_run_next() {
+    TASK_MANAGER.mark_current_exited();
+    TASK_MANAGER.run_next_task();
+}
 ```
 
-`UnInit` 与 `Exited` 天然不会被选中。`suspend` 时当前任务已改回 `Ready`，若只有它一个
-就选回自身；`exit` 时当前任务已 `Exited`，不会自选。与 GDB 观察到的 `0→1`、`9→10`、
-`3→4` 轮转一致。
+### 3.2 初始化范围：与参考实现最重要的差异
 
-### 3.3 状态变化与恢复
+参考实现（`ch3`）的初始化循环遍历整个数组：
 
-状态迁移与参考一致：`suspend` 把 `Running→Ready` 并保留可恢复上下文；`exit` 把
-`Running→Exited`（终态）并让后继继续。恢复时 `__switch` 载入 `ra/sp/s0..s11`，被暂停
-任务的调用栈得以延续（§2.5 的条件断点即证明）。
-
-### 3.4 借用与上下文指针
-
-两者都在 `__switch` 前 `drop(inner)`。本实现额外在 `run_first_task` 中显式写入
-`current_task = 0`，并在注释中说明上下文指针指向静态 `TASK_MANAGER`、释放借用后仍
-有效。这样既避免 `RefCell` 的运行期借用冲突，也保证切换期间指针有效。
-
-### 3.5 内部组织
-
-参考实现把逻辑分散在 `impl TaskManager` 的多个方法与同名的模块级包装函数中；本实现
-采用同样的分层（方法 + 薄封装），但由我们自行命名与拆分，接口签名、返回类型与
-可见性保持不变。差异仅在内部组织，不影响行为。
-
-### 3.6 验收
-
-`ch3-api` 分支上执行 `cd os && make run CHAPTER=3 BASE=2`，通过全部断言：
-
-```text
-Test write A OK!
-Test write B OK!
-Test write C OK!
-Test sleep OK!
-Test sleep1 passed!
-Test trace OK!
+```rust
+for (i, task) in tasks.iter_mut().enumerate() {          // 0..MAX_APP_NUM
+    task.task_cx = TaskContext::goto_restore(init_app_cx(i));
+    task.task_status = TaskStatus::Ready;
+}
 ```
+
+本实现按接口契约只初始化已加载的应用：
+
+```rust
+let mut tasks = [TaskControlBlock {
+    task_status: TaskStatus::UnInit,
+    task_cx: TaskContext::zero_init(),
+    syscall_counts: [0; MAX_SYSCALL_NUM],
+}; MAX_APP_NUM];
+for (i, task) in tasks.iter_mut().enumerate().take(num_app) {   // 0..num_app
+    task.task_cx = TaskContext::goto_restore(init_app_cx(i));
+    task.task_status = TaskStatus::Ready;
+}
+```
+
+- **契约要求**：`0..num_app` 的任务为 `Ready` 且带首运行上下文，其余槽位保持
+  `UnInit`。
+- **GDB 实测**：参考实现 `init_app_cx` 被调用 **16** 次（`MAX_APP_NUM`），而
+  `num_app = 13`（§2.2），说明它多初始化了 3 个不存在的应用。这些槽位因
+  `find_next_task` 只在 `0..num_app` 内搜索而不会被调度，行为上无害，但不符合契约，
+  也为不存在的应用生成了上下文。
+- **结论**：本实现在语义上更严格地遵守接口约定；两者的可调度任务集合相同，
+  因此运行结果一致。
+
+### 3.3 轮转选择
+
+两者算法相同：从当前任务之后开始、在 `0..num_app` 内取模，选择第一个 `Ready`。
+
+```rust
+fn find_next_task(&self) -> Option<usize> {
+    let inner = self.inner.exclusive_access();
+    let current = inner.current_task;
+    (current + 1..=current + self.num_app)
+        .map(|id| id % self.num_app)
+        .find(|id| inner.tasks[*id].task_status == TaskStatus::Ready)
+}
+```
+
+- `UnInit` 与 `Exited` 不会被选中，因此退出任务自然被排除。
+- `suspend` 时当前任务已改回 `Ready`：若在它之后没有任何 `Ready` 任务，轮转一圈会
+  选回自身（`__switch` 自切换等价于空操作），保证单任务或其他任务都不可运行时不丢 CPU。
+- 与 GDB 观察一致：时钟抢占 `0→1`、`sys_yield` `9→10`、退出后 `3→4`（§2）。
+
+### 3.4 状态迁移
+
+| 事件 | 当前任务 | 后继任务 | 说明 |
+| --- | --- | --- | --- |
+| `run_first_task` | 任务 0 `Running` | — | `current_task = 0` |
+| `sys_yield` / 时钟 | `Running → Ready` | 选择的 `Ready → Running` | 保留可恢复上下文 |
+| `sys_exit` / 异常 | `Running → Exited` | 选择的 `Ready → Running` | 终态，不再被调度 |
+
+迁移与参考实现逐条一致；差异仅在初始化时未使用槽位的状态（`UnInit` vs `Ready`）。
+
+### 3.5 上下文恢复
+
+首次运行与再次恢复共用 `TaskContext` 与 `__switch`：
+
+- **首次**：`goto_restore(init_app_cx(i))` 使 `ra = __restore`、`sp = TrapContext`；被恢复
+  后先执行 `__restore`，`sret` 进入用户态（GDB §2.2）。
+- **再次**：`__switch` 在切换时把被调用者保存寄存器（`ra/sp/s0..s11`）写入当前任务的
+  `TaskContext`；恢复时载入，被暂停的内核调用栈得以延续（GDB §2.5 的条件断点证明
+  任务在保存的 `ra/sp` 上恢复）。
+
+本实现与参考实现在此完全一致，因为 `TaskContext` 的构造与 `__switch` 都由框架提供，
+我们只负责在正确的时机调用。
+
+### 3.6 借用释放与上下文指针有效性
+
+`UPSafeCell` 是 `RefCell` 的封装，`__switch` 会切换内核栈，因此两版实现都在
+`__switch` 之前 `drop(inner)`：
+
+```rust
+let current_task_cx_ptr = &mut inner.tasks[current].task_cx as *mut TaskContext;
+let next_task_cx_ptr = &inner.tasks[next].task_cx as *const TaskContext;
+drop(inner);                                   // 释放运行期借用
+unsafe { __switch(current_task_cx_ptr, next_task_cx_ptr); }
+```
+
+若借用未释放，其他任务再次访问 `TASK_MANAGER` 会触发 `RefCell` 的运行期 panic；两个
+裸指针指向静态 `TASK_MANAGER`，释放借用后仍然有效。本实现额外在 `run_first_task` 中
+显式写入 `current_task = 0` 并注解这一约定，便于阅读。
+
+### 3.7 内部函数组织
+
+参考实现把逻辑放在 `impl TaskManager` 的多个方法里，并在模块级写同名的包装函数；
+本实现采用相同的「方法 + 薄封装」分层，但方法由我们自行命名与拆分，对外只暴露
+契约要求的三个入口。接口名称、可见性、参数与返回类型保持不变。因此两者的调用方
+（`rust_main`、`sys_yield`、`sys_exit`、`trap_handler`）无需任何改动。
+
+### 3.8 相同点与差异汇总
+
+**相同点（行为一致的原因）**
+
+| 方面 | 说明 |
+| --- | --- |
+| 接口 | 四处 TODO 的签名/可见性/返回类型完全相同，调用方一致 |
+| 首任务 | 都固定选任务 0，置 `Running`，`current_task = 0` |
+| 轮转 | 都在 `0..num_app` 内从 `current+1` 取模找 `Ready` |
+| 状态 | `suspend → Ready`、`exit → Exited`，`Exited` 为终态 |
+| 上下文 | 都用框架提供的 `TaskContext`/`goto_restore`/`__switch` |
+| 借用 | 都在 `__switch` 前 `drop(inner)` |
+| 结束 | 无 `Ready` 任务时都 `panic!("All applications completed!")` |
+
+**差异（实现取舍，不影响行为）**
+
+| 方面 | 参考实现 | 本实现 | 原因 |
+| --- | --- | --- | --- |
+| 初始化范围 | 遍历 `0..MAX_APP_NUM` 全置 `Ready` | 只初始化 `0..num_app`，其余 `UnInit` | 遵守接口契约 |
+| 内部命名/拆分 | 参考自身命名 | 自行命名五个私有方法 | 契约允许自由组织 |
+| `run_first_task` | 未显式重设 `current_task` | 显式 `current_task = 0` | 更清晰、防御性 |
+| 注释 | 无 | 增加借用/指针说明 | 便于维护 |
+
+### 3.9 验证
+
+- **功能**：`ch3-api` 上 `cd os && make run CHAPTER=3 BASE=2` 通过全部断言
+  （`Test write A/B/C OK!`、`Test sleep OK!`、`Test sleep1 passed!`、`Test trace OK!`），
+  运行日志见 `reports/ch3-api-run.log`；参考实现同一批断言的输出见
+  [`reports/ch3-qemu-run.log`](ch3-qemu-run.log)。两者结果一致。
+- **调度**：GDB 跟踪（§2）显示首任务启动、时钟抢占、`sys_yield` 暂停/恢复、退出后
+  轮转的状态与上下文均符合上述设计。
 
 ## 4. 主要问题与解决思路
 
