@@ -1,0 +1,1 @@
+{"schema":"course-log-v1","id":"8a0e34cc-4d32-4e5c-a0e0-055b0ebe7c73","timestamp":"2026-10-07T12:07:09.989Z","session":"","type":"ai_file_operation","actor":"ai","source":"ai-adapter","file":"os/src/syscall/fs.rs","tool":"pi","operation":"read","confidence":"high"}

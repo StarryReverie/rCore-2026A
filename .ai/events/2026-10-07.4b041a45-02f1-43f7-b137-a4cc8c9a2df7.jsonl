@@ -1,0 +1,1 @@
+{"schema":"course-log-v1","id":"4b041a45-02f1-43f7-b137-a4cc8c9a2df7","timestamp":"2026-10-07T12:06:45.165Z","session":"","type":"ai_file_operation","actor":"ai","source":"ai-adapter","file":"os/src/mm/memory_set.rs","tool":"pi","operation":"read","confidence":"high"}

@@ -1,0 +1,1 @@
+{"schema":"course-log-v1","id":"638ff5af-6296-4a2b-a12a-a6fa5042f3aa","timestamp":"2026-10-07T12:06:57.558Z","session":"","type":"ai_file_operation","actor":"ai","source":"ai-adapter","file":"os/src/mm/address.rs","tool":"pi","operation":"read","confidence":"high"}
