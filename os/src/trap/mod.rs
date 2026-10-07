@@ -61,7 +61,33 @@ pub fn init() {
 /// and stval. Do not add scheduling or fault recovery. Application loading,
 /// context restoration, and successful shutdown after the last app are provided.
 pub fn trap_handler(cx: &mut TrapContext) -> &mut TrapContext {
-    todo!("ch2 API: implement trap_handler")
+    let scause = scause::read();
+    let stval = stval::read();
+    match scause.cause() {
+        Trap::Exception(Exception::UserEnvCall) => {
+            // The saved sepc points at the ecall itself; skip it so that the
+            // restore path resumes at the following instruction.
+            cx.sepc += 4;
+            // Read a7/a0..a2 before writing the result back to a0.
+            cx.x[10] = syscall(cx.x[17], [cx.x[10], cx.x[11], cx.x[12]]) as usize;
+        }
+        Trap::Exception(Exception::StoreFault) | Trap::Exception(Exception::StorePageFault) => {
+            println!("[kernel] PageFault in application, kernel killed it.");
+            run_next_app();
+        }
+        Trap::Exception(Exception::IllegalInstruction) => {
+            println!("[kernel] IllegalInstruction in application, kernel killed it.");
+            run_next_app();
+        }
+        _ => {
+            panic!(
+                "Unsupported trap {:?}, stval = {:#x}!",
+                scause.cause(),
+                stval
+            );
+        }
+    }
+    cx
 }
 
 pub use context::TrapContext;

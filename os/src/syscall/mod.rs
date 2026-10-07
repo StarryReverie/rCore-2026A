@@ -36,5 +36,9 @@ use process::*;
 /// An unsupported ID must panic with the ID, rather than report success or add
 /// a new syscall. Do not modify the trap context or advance sepc in this layer.
 pub fn syscall(syscall_id: usize, args: [usize; 3]) -> isize {
-    todo!("ch2 API: implement syscall")
+    match syscall_id {
+        SYSCALL_WRITE => sys_write(args[0], args[1] as *const u8, args[2]),
+        SYSCALL_EXIT => sys_exit(args[0] as i32),
+        _ => panic!("Unsupported syscall_id: {}", syscall_id),
+    }
 }
