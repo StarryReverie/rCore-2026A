@@ -1,8 +1,10 @@
-# rCore ch2 实验报告：用户程序、系统调用与异常处理的静态分析与 GDB 动态跟踪
+# rCore ch2 实验报告：用户程序、系统调用与异常处理的静态分析、GDB 动态跟踪与独立实现
 
-本报告对应第 2 章，分析对象是 `ch2` 分支的参考实现（`make build MODE=debug BASE=2`
-构建的调试内核）。报告包含静态分析与 GDB 动态跟踪两部分；独立实现与参考实现的
-对比见 `ch2-api` 分支的报告。
+本报告对应第 2 章。分析对象是 `ch2` 分支的参考实现（`make build MODE=debug BASE=2`
+构建的调试内核）；独立实现位于 `ch2-api` 分支的
+[`os/src/syscall/mod.rs`](../os/src/syscall/mod.rs) 与
+[`os/src/trap/mod.rs`](../os/src/trap/mod.rs)。报告包含三部分：静态分析与动态跟踪、
+独立实现与对比、主要问题与解决思路。
 
 ## 0. 实验环境与构建
 
@@ -14,6 +16,7 @@
 | GDB | GNU gdb 17.2，多架构，`set architecture riscv:rv64` |
 | 固件 | `bootloader/rustsbi-qemu.bin` |
 | 参考实现 | `ch2` 分支 |
+| 独立实现 | `ch2-api` 分支 |
 
 调试构建与运行：
 
@@ -278,8 +281,155 @@ return value stored in a0 = 37        # cx.x[10]
 
 ## 3. 独立实现与对比
 
-（见 `ch2-api` 分支报告，此处从略。）
+独立实现只修改两个文件、两处 TODO：
+
+- [`os/src/syscall/mod.rs::syscall()`](../os/src/syscall/mod.rs)
+- [`os/src/trap/mod.rs::trap_handler()`](../os/src/trap/mod.rs)
+
+其余部分（`rust_main`、`trap.S`、批处理加载器、`sys_write`、`sys_exit`）由框架提供。
+完成后的实现（省略注释）：
+
+```rust
+// os/src/syscall/mod.rs
+pub fn syscall(syscall_id: usize, args: [usize; 3]) -> isize {
+    match syscall_id {
+        SYSCALL_WRITE => sys_write(args[0], args[1] as *const u8, args[2]),
+        SYSCALL_EXIT => sys_exit(args[0] as i32),
+        _ => panic!("Unsupported syscall_id: {}", syscall_id),
+    }
+}
+
+// os/src/trap/mod.rs
+pub fn trap_handler(cx: &mut TrapContext) -> &mut TrapContext {
+    let scause = scause::read();
+    let stval = stval::read();
+    match scause.cause() {
+        Trap::Exception(Exception::UserEnvCall) => {
+            cx.sepc += 4;
+            cx.x[10] = syscall(cx.x[17], [cx.x[10], cx.x[11], cx.x[12]]) as usize;
+        }
+        Trap::Exception(Exception::StoreFault) | Trap::Exception(Exception::StorePageFault) => {
+            println!("[kernel] PageFault in application, kernel killed it.");
+            run_next_app();
+        }
+        Trap::Exception(Exception::IllegalInstruction) => {
+            println!("[kernel] IllegalInstruction in application, kernel killed it.");
+            run_next_app();
+        }
+        _ => panic!("Unsupported trap {:?}, stval = {:#x}!", scause.cause(), stval),
+    }
+    cx
+}
+```
+
+### 3.1 与参考实现的相同点及原因
+
+| 方面 | 相同点 | 为什么一致 |
+| --- | --- | --- |
+| 分派方式 | `syscall()` 用 `match syscall_id`，`trap_handler()` 用 `match scause.cause()` | 契约固定了接口与分支集合，`match` 能穷尽分支并让未支持情况显式落入 `_` |
+| 系统调用参数 | 编号取 `a7`（`cx.x[17]`），参数取 `a0..a2`（`cx.x[10..=12]`） | RISC-V 调用约定与契约规定 |
+| `sepc` 处理 | 只在 `UserEnvCall` 分支 `cx.sepc += 4` | `ecall` 长 4 字节，恢复后需越过它 |
+| 返回值 | `syscall()` 的 `isize` 结果 `as usize` 写回 `cx.x[10]` | `a0` 同时是第一个参数和返回值寄存器 |
+| `exit` 语义 | `sys_exit(args[0] as i32)` 不返回 | 其返回类型是 `!`，在 `match` 中可直接充当 `isize` 分支 |
+| 异常处理 | `StoreFault/StorePageFault`、`IllegalInstruction` 打印提示后 `run_next_app()` | 异常是终止性的，必须交给批处理系统切换应用 |
+| 未知情况 | 未知系统调用编号、未知 Trap 均 `panic!` | 契约要求如实报告而非伪造成功 |
+| 分层 | `syscall()` 不碰上下文；`trap_handler()` 负责 `sepc` 与 `a0` | 契约明确划分“接口转换”和“上下文管理” |
+
+本实验的骨架是由参考实现删去两处函数体得到的，加上接口契约把行为规定得很具体，
+因此两版实现功能等价是预期结果。`make run BASE=2` 下的实际输出也一致（见第 2 章
+验收与 `reports/ch2-api-run.log`）。
+
+### 3.2 与参考实现的差异（实现取舍，非行为差异）
+
+1. **注释**：我们在 `sepc += 4` 和“先取参数再写回”处加了说明性注释，参考实现没有。
+2. **语句拆分**：参考实现在 `UserEnvCall` 分支把 `sepc` 自增与调用/写回写在两行；
+   我们把“调用并写回 `cx.x[10]`”单独作为一条赋值语句。Rust 先求右值再赋值，两种
+   写法的求值顺序相同、行为一致，但拆分后“先读 `x[10..=12]` 作为参数、再写回 `x[10]`”
+   这一顺序更直观，也避免在同一条语句里一边读一边写同一个数组元素。
+3. **不使用辅助函数**：两个函数都很短，直接内联最贴近契约、作用域最小；契约虽然允许
+   私有辅助函数，但没有必要。
+4. **不扩大范围**：未加入用户指针校验、页表转换、FD 管理、调度或异常恢复，参考实现
+   同样没有；非法 fd 与非法 UTF-8 的处理沿用框架既有 `panic!`。
+5. **保留骨架属性**：保留了两处文件顶部的 `#![allow(...)]` 内部属性，它们只影响 lint，
+   不影响行为。
+
+### 3.3 参数、`sepc` 与返回值的处理
+
+- `syscall()` 只把三个机器字转换成对应接口的参数：`write` 原样返回 `sys_write()` 的
+  `isize` 结果；`exit` 的参数转 `i32` 后交 `sys_exit()`。
+- `trap_handler()` 在 `UserEnvCall` 分支先 `cx.sepc += 4`，再调用 `syscall()`，最后写回
+  `cx.x[10]`；参数在写回之前从 `cx` 读出，因此不会被返回值覆盖。
+- `sys_exit()` 经 `run_next_app()` 切到下一个应用，控制流不返回，因此该应用不会发生
+  返回值写回或上下文恢复。这与 GDB 跟踪中 `sys_exit exit_code=0` 后紧跟
+  `load_app` 的现象一致。
+
+### 3.4 异常控制流
+
+`StoreFault/StorePageFault` 与 `IllegalInstruction` 都走“打印提示 → `run_next_app()`”
+的终止路径：不恢复原上下文、不推进 `sepc`。这与系统调用路径形成对照——系统调用是
+应用主动请求、可返回；异常是应用已无法继续、必须切换应用。
+
+### 3.5 验收
+
+`ch2-api` 分支上运行 `cd os && make run BASE=2`，输出保存在 `reports/ch2-api-run.log`：
+`num_app = 7`，`app_0` 触发 PageFault（release 构建）后被终止，`app_1`/`app_2` 触发
+IllegalInstruction，`app_3` 输出 `Hello, world from user mode program!`，`app_4`–`app_6`
+分别输出 `Test power_3/5/7 OK!`，最后 `All applications completed!`，QEMU 正常退出。
 
 ## 4. 主要问题与解决思路
 
-（待补。）
+### 4.1 NixOS 没有 `riscv64-unknown-elf-gdb`
+
+- **现象**：按任务书直接用 `riscv64-unknown-elf-gdb` 会找不到命令。
+- **原因**：Nix dev shell 提供的是多架构 `gdb`（17.2），没有单独的 RISC-V 交叉 gdb。
+- **解决**：在 `os/Makefile` 中把调试器抽成变量 `GDB ?= riscv64-unknown-elf-gdb`，
+  并用于 `debug`/`gdbclient`；本地执行 `make ... GDB=gdb`。
+
+### 4.2 调试构建把用户程序也编成 debug
+
+- **现象**：`make build MODE=debug BASE=2` 后，`ch2b_bad_address` 并没有触发
+  StoreFault，而是在用户态打印 `unsafe precondition(s) violated: ptr::write_volatile ...`。
+- **原因**：`MODE=debug` 作为命令行变量经 `MAKEFLAGS` 传给子目录 `user` 的构建，
+  用户程序也被编成 debug 版，`write_volatile` 的前置条件检查因此生效。
+- **处理**：任务书规定 `StoreFault`/`StorePageFault` 分支只做源码分析，这不影响本次
+  对系统调用与非法指令路径的跟踪；发布/验收运行仍用默认的 release 构建。
+
+### 4.3 GDB 脚本与 QEMU 后台进程的启动
+
+- **现象**：把 `cd os && qemu ... &` 写在一条命令里时，`cd` 也进了后台子 shell，
+  gdb 实际在仓库根目录运行，报 `No such file or directory`，找不到命令脚本和内核 ELF。
+- **原因**：`&` 作用于整个 `cd ... && qemu ...` 列表，`cd` 只在那个子 shell 生效。
+- **解决**：先 `cd` 再单独 `qemu ... &`，并记录 QEMU 的 PID；结束后按 PID 结束进程。
+  排查时避免用 `pkill -f 'qemu-system-riscv64'`，因为该模式会匹配到正在执行命令的
+  当前 shell 自身，误杀自己。
+
+### 4.4 批次结束时的 `Remote connection closed`
+
+- **现象**：GDB 脚本最后 `continue` 时报 `Remote connection closed`，gdb 退出码非 0。
+- **原因**：所有应用运行完后，内核调用 QEMU 退出设备使 QEMU 结束，GDB 的远程连接随
+  之断开。这是正常结束，不是错误。
+- **处理**：把最后一条 `continue` 放在脚本末尾，允许连接断开后再退出；日志在此之前
+  已完整写入 `reports/ch2-gdb.log`。
+
+### 4.5 分支切换被 AI 会话归档阻塞
+
+- **现象**：`git switch` 报 `Your local changes to the following files would be
+  overwritten by checkout: .ai/agent-sessions/pi/*.jsonl`。
+- **原因**：实时的 pi 会话归档被记录工具持续追加；该文件在目标分支已被跟踪，切换会
+  覆盖未提交改动，git 因此拒绝。
+- **解决**：切换分支前先把过程记录提交（本仓库要求 `.ai/` 记录随代码提交），再切换。
+
+### 4.6 由保存的 `sepc` 确认非法指令
+
+- **问题**：`scause=2` 的具体非法指令需要确认。
+- **依据与解决**：GDB 记录 `sepc=0x804001fc`，用 `rust-objdump` 反汇编
+  `ch2b_bad_instructions` 得到 `0x804001fc <main>: sret`，二者吻合，确认是 U 模式执行
+  特权指令 `sret` 触发 IllegalInstruction。
+
+### 4.7 尚未解决/说明
+
+- 本环境无法在 `MODE=debug` 下单独把用户程序编成 release（`MODE` 会随 `MAKEFLAGS`
+  传播），所以 GDB 跟踪中 `ch2b_bad_address` 的行为与验收运行不同；如需复现 release
+  行为可在 gdb 前单独以 release 构建 `user`，但本章不要求。
+- 未知系统调用与不支持的 Trap 需要构造额外应用才能动态触发，现有 7 个应用未覆盖，
+  按契约保留为源码分析与 `panic!` 路径，不在本实验新增测例。
