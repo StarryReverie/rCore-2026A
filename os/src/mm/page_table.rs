@@ -102,10 +102,44 @@ impl PageTable {
             frames: Vec::new(),
         }
     }
-    // Implementation hints:
-    //
-    // fn find_pte_create(&mut self, vpn: VirtPageNum) -> Option<&mut PageTableEntry>;
-    // fn find_pte(&self, vpn: VirtPageNum) -> Option<&mut PageTableEntry>;
+    /// Walk the Sv39 three levels down to `vpn`'s final-level entry,
+    /// allocating a zeroed page-table frame for every invalid intermediate
+    /// entry. Returns `None` if such a frame cannot be allocated.
+    fn find_pte_create(&mut self, vpn: VirtPageNum) -> Option<&mut PageTableEntry> {
+        let idxs = vpn.indexes();
+        let mut ppn = self.root_ppn;
+        for level in 0..3 {
+            let pte = &mut ppn.get_pte_array()[idxs[level]];
+            if level == 2 {
+                return Some(pte);
+            }
+            if !pte.is_valid() {
+                let frame = frame_alloc()?;
+                *pte = PageTableEntry::new(frame.ppn, PTEFlags::V);
+                self.frames.push(frame);
+            }
+            ppn = pte.ppn();
+        }
+        unreachable!()
+    }
+    /// Walk the Sv39 three levels down to `vpn`'s final-level entry without
+    /// allocating anything. Returns `None` when an intermediate entry is
+    /// invalid, so the final level is unreachable.
+    fn find_pte(&self, vpn: VirtPageNum) -> Option<&mut PageTableEntry> {
+        let idxs = vpn.indexes();
+        let mut ppn = self.root_ppn;
+        for level in 0..3 {
+            let pte = &mut ppn.get_pte_array()[idxs[level]];
+            if level == 2 {
+                return Some(pte);
+            }
+            if !pte.is_valid() {
+                return None;
+            }
+            ppn = pte.ppn();
+        }
+        unreachable!()
+    }
 
     /// Todo: Map a virtual page to the specified physical page.
     ///
@@ -118,7 +152,13 @@ impl PageTable {
     /// This page table owns its intermediate page table frames through `frames`;
     /// ownership of the mapped data frame remains with the caller.
     pub fn map(&mut self, vpn: VirtPageNum, ppn: PhysPageNum, flags: PTEFlags) -> Option<()> {
-        todo!("mm::PageTable::map")
+        let pte = self.find_pte_create(vpn)?;
+        // Refuse to overwrite an existing valid mapping.
+        if pte.is_valid() {
+            return None;
+        }
+        *pte = PageTableEntry::new(ppn, flags | PTEFlags::V);
+        Some(())
     }
 
     /// Todo: Remove the mapping for a virtual page.
@@ -128,7 +168,14 @@ impl PageTable {
     /// Constraints: Other mappings remain valid. Data-frame allocation and
     /// reclamation belong to the caller.
     pub fn unmap(&mut self, vpn: VirtPageNum) {
-        todo!("mm::PageTable::unmap")
+        let pte = self.find_pte(vpn).unwrap();
+        assert!(
+            pte.is_valid(),
+            "vpn {:?} is invalid before unmapping",
+            vpn
+        );
+        // The data frame itself is owned by the caller; only drop the mapping.
+        *pte = PageTableEntry::empty();
     }
 
     /// Todo: Look up the final-level page table entry for a virtual page.
@@ -140,7 +187,8 @@ impl PageTable {
     /// entry's flags; returning an entry does not imply that its valid bit is set
     /// or that it permits user access.
     pub fn translate(&self, vpn: VirtPageNum) -> Option<PageTableEntry> {
-        todo!("mm::PageTable::translate")
+        // Copy the stored entry; the caller inspects its validity and flags.
+        self.find_pte(vpn).map(|pte| *pte)
     }
 
     /// Todo: Translate a user address with the requested access permissions.
@@ -153,7 +201,21 @@ impl PageTable {
     /// must have `V`, `U`, and every requested permission bit set.
     /// The physical address must retain the original page offset.
     pub fn translate_user(&self, addr: usize, permission: PTEFlags) -> Option<PhysAddr> {
-        todo!("mm::PageTable::translate_user")
+        let va = VirtAddr::from(addr);
+        // `VirtAddr::from` masks to 39 bits; the round trip rejects any
+        // non-canonical Sv39 address instead of silently truncating it.
+        if usize::from(va) != addr {
+            return None;
+        }
+        let pte = self.translate(va.floor())?;
+        // Reaching a final PTE is not enough: the page must be valid, user
+        // accessible, and grant every requested permission bit.
+        if !pte.flags().contains(PTEFlags::V | PTEFlags::U | permission) {
+            return None;
+        }
+        let page_base = PhysAddr::from(pte.ppn());
+        // Preserve the byte within the page, not just its base address.
+        Some(PhysAddr(page_base.0 + va.page_offset()))
     }
 
     /// get the token from the page table
@@ -173,5 +235,26 @@ impl PageTable {
 /// Every slice must stay within its backing page, and the backing frames
 /// must remain valid while the returned slices are used.
 pub fn translated_byte_buffer(token: usize, ptr: *const u8, len: usize) -> Vec<&'static mut [u8]> {
-    todo!("mm::translated_byte_buffer")
+    let page_table = PageTable::from_token(token);
+    let mut start = ptr as usize;
+    let end = start + len;
+    let mut buffers = Vec::new();
+    // Walk one page at a time; a physically noncontiguous mapping simply
+    // swaps the backing ppn between iterations.
+    while start < end {
+        let start_va = VirtAddr::from(start);
+        let mut vpn = start_va.floor();
+        let ppn = page_table.translate(vpn).unwrap().ppn();
+        vpn.step();
+        let mut end_va: VirtAddr = vpn.into();
+        end_va = end_va.min(VirtAddr::from(end));
+        if end_va.page_offset() == 0 {
+            // The slice ends exactly at a page boundary.
+            buffers.push(&mut ppn.get_bytes_array()[start_va.page_offset()..]);
+        } else {
+            buffers.push(&mut ppn.get_bytes_array()[start_va.page_offset()..end_va.page_offset()]);
+        }
+        start = end_va.into();
+    }
+    buffers
 }

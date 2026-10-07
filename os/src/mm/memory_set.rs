@@ -174,9 +174,8 @@ lazy_static! {
     /// Map `TRAMPOLINE` to the physical page at `strampoline` with RX and no U.
     /// Keep the trampoline outside `areas`. Task-specific kernel stacks are
     /// added by the task module.
-    pub static ref KERNEL_SPACE: Arc<UPSafeCell<MemorySet>> = {
-        todo!("mm::KERNEL_SPACE")
-    };
+    pub static ref KERNEL_SPACE: Arc<UPSafeCell<MemorySet>> =
+        Arc::new(unsafe { UPSafeCell::new(MemorySet::new_kernel()) });
 }
 
 impl MemorySet {
@@ -192,11 +191,102 @@ impl MemorySet {
         self.page_table.token()
     }
 
-    // Implementation hints:
-    //
-    // fn push(&mut self, mut map_area: MapArea, data: Option<&[u8]>) -> Option<()>;
-    // fn map_trampoline(&mut self);
-    // pub fn new_kernel() -> Self;
+    /// Map `map_area`, copy optional segment data into it, and record it in
+    /// `areas`. On failure the (possibly partial) area is still recorded so
+    /// that `areas` remains the single owner of its frames; callers treat the
+    /// `None` result as the failure signal.
+    fn push(&mut self, mut map_area: MapArea, data: Option<&[u8]>) -> Option<()> {
+        let result = map_area.map(&mut self.page_table);
+        if result.is_some() {
+            if let Some(data) = data {
+                map_area.copy_data(&mut self.page_table, data);
+            }
+        }
+        self.areas.push(map_area);
+        result
+    }
+    /// Map the trampoline page. It is deliberately not registered in `areas`.
+    fn map_trampoline(&mut self) {
+        self.page_table
+            .map(
+                VirtAddr::from(TRAMPOLINE).into(),
+                PhysAddr::from(strampoline as usize).into(),
+                PTEFlags::R | PTEFlags::X,
+            )
+            .unwrap();
+    }
+    /// Build the shared kernel address space. Task kernel stacks are added
+    /// later by the task module through `insert_framed_area`.
+    pub fn new_kernel() -> Self {
+        let mut memory_set = Self::new_bare();
+        memory_set.map_trampoline();
+        info!(".text   [{:#x}, {:#x})", stext as usize, etext as usize);
+        info!(".rodata [{:#x}, {:#x})", srodata as usize, erodata as usize);
+        info!(".data   [{:#x}, {:#x})", sdata as usize, edata as usize);
+        info!(
+            ".bss    [{:#x}, {:#x})",
+            sbss_with_stack as usize, ebss as usize
+        );
+        info!("phys    [{:#x}, {:#x})", ekernel as usize, MEMORY_END);
+        // Every kernel section is identity mapped with the least privilege it
+        // needs, and none of them is accessible from user mode.
+        memory_set
+            .push(
+                MapArea::new(
+                    (stext as usize).into(),
+                    (etext as usize).into(),
+                    MapType::Identical,
+                    MapPermission::R | MapPermission::X,
+                ),
+                None,
+            )
+            .unwrap();
+        memory_set
+            .push(
+                MapArea::new(
+                    (srodata as usize).into(),
+                    (erodata as usize).into(),
+                    MapType::Identical,
+                    MapPermission::R,
+                ),
+                None,
+            )
+            .unwrap();
+        memory_set
+            .push(
+                MapArea::new(
+                    (sdata as usize).into(),
+                    (edata as usize).into(),
+                    MapType::Identical,
+                    MapPermission::R | MapPermission::W,
+                ),
+                None,
+            )
+            .unwrap();
+        memory_set
+            .push(
+                MapArea::new(
+                    (sbss_with_stack as usize).into(),
+                    (ebss as usize).into(),
+                    MapType::Identical,
+                    MapPermission::R | MapPermission::W,
+                ),
+                None,
+            )
+            .unwrap();
+        memory_set
+            .push(
+                MapArea::new(
+                    (ekernel as usize).into(),
+                    MEMORY_END.into(),
+                    MapType::Identical,
+                    MapPermission::R | MapPermission::W,
+                ),
+                None,
+            )
+            .unwrap();
+        memory_set
+    }
 
     /// Todo: Add an area backed by newly allocated data frames.
     ///
@@ -213,7 +303,10 @@ impl MemorySet {
         end_va: VirtAddr,
         permission: MapPermission,
     ) -> Option<()> {
-        todo!("mm::MemorySet::insert_framed_area")
+        self.push(
+            MapArea::new(start_va, end_va, MapType::Framed, permission),
+            None,
+        )
     }
 
     /// Todo: Build a user address space for an ELF application.
@@ -229,7 +322,92 @@ impl MemorySet {
     /// Map `TRAMPOLINE` to `strampoline` with RX and no U, outside `areas`.
     /// Each application owns its data frames independently.
     pub fn from_elf(elf_data: &[u8]) -> (Self, usize, usize) {
-        todo!("mm::MemorySet::from_elf")
+        let mut memory_set = Self::new_bare();
+        // Every user page table carries the same trampoline mapping.
+        memory_set.map_trampoline();
+        // Load every `PT_LOAD` segment as its own framed area.
+        let elf = xmas_elf::ElfFile::new(elf_data).unwrap();
+        let elf_header = elf.header;
+        let magic = elf_header.pt1.magic;
+        assert_eq!(magic, [0x7f, 0x45, 0x4c, 0x46], "invalid elf!");
+        let ph_count = elf_header.pt2.ph_count();
+        let mut max_end_vpn = VirtPageNum(0);
+        for i in 0..ph_count {
+            let ph = elf.program_header(i).unwrap();
+            if ph.get_type().unwrap() != xmas_elf::program::Type::Load {
+                continue;
+            }
+            let start_va: VirtAddr = (ph.virtual_addr() as usize).into();
+            let end_va: VirtAddr = ((ph.virtual_addr() + ph.mem_size()) as usize).into();
+            let mut map_perm = MapPermission::U;
+            let ph_flags = ph.flags();
+            if ph_flags.is_read() {
+                map_perm |= MapPermission::R;
+            }
+            if ph_flags.is_write() {
+                map_perm |= MapPermission::W;
+            }
+            if ph_flags.is_execute() {
+                map_perm |= MapPermission::X;
+            }
+            let map_area = MapArea::new(start_va, end_va, MapType::Framed, map_perm);
+            max_end_vpn = map_area.vpn_range.get_end();
+            memory_set
+                .push(
+                    map_area,
+                    Some(
+                        &elf.input
+                            [ph.offset() as usize..(ph.offset() + ph.file_size()) as usize],
+                    ),
+                )
+                .unwrap();
+        }
+        // User stack sits right above the highest segment page, separated by
+        // one unmapped guard page.
+        let max_end_va: VirtAddr = max_end_vpn.into();
+        let mut user_stack_bottom: usize = max_end_va.into();
+        user_stack_bottom += PAGE_SIZE;
+        let user_stack_top = user_stack_bottom + USER_STACK_SIZE;
+        memory_set
+            .push(
+                MapArea::new(
+                    user_stack_bottom.into(),
+                    user_stack_top.into(),
+                    MapType::Framed,
+                    MapPermission::R | MapPermission::W | MapPermission::U,
+                ),
+                None,
+            )
+            .unwrap();
+        // Empty heap area for `sbrk`; it is grown later through `append_to`.
+        memory_set
+            .push(
+                MapArea::new(
+                    user_stack_top.into(),
+                    user_stack_top.into(),
+                    MapType::Framed,
+                    MapPermission::R | MapPermission::W | MapPermission::U,
+                ),
+                None,
+            )
+            .unwrap();
+        // Trap context is kernel-only, so it is mapped RW without U.
+        memory_set
+            .push(
+                MapArea::new(
+                    TRAP_CONTEXT_BASE.into(),
+                    TRAMPOLINE.into(),
+                    MapType::Framed,
+                    MapPermission::R | MapPermission::W,
+                ),
+                None,
+            )
+            .unwrap();
+        (
+            memory_set,
+            user_stack_top,
+            elf.header.pt2.entry_point() as usize,
+        )
     }
 
     /// Change page table by writing satp CSR Register.
@@ -272,7 +450,13 @@ impl MemorySet {
     /// metadata are removed, and its owned data frames are released.
     /// Other areas retain their mappings and contents.
     pub fn remove_framed_area(&mut self, start: VirtPageNum, end: VirtPageNum) -> Option<()> {
-        todo!("mm::MemorySet::remove_framed_area")
+        let index = self.areas.iter().position(|area| {
+            area.vpn_range.get_start() == start && area.vpn_range.get_end() == end
+        })?;
+        // `MapArea::unmap` clears the PTEs and drops the data frames it owns.
+        self.areas[index].unmap(&mut self.page_table);
+        self.areas.remove(index);
+        Some(())
     }
 
     /// Todo: Shrink an existing area to a new end address.
@@ -285,7 +469,16 @@ impl MemorySet {
     /// are unmapped and their owned data frames are released.
     #[allow(unused)]
     pub fn shrink_to(&mut self, start: VirtAddr, new_end: VirtAddr) -> bool {
-        todo!("mm::MemorySet::shrink_to")
+        if let Some(area) = self
+            .areas
+            .iter_mut()
+            .find(|area| area.vpn_range.get_start() == start.floor())
+        {
+            area.shrink_to(&mut self.page_table, new_end.ceil());
+            true
+        } else {
+            false
+        }
     }
 
     /// Todo: Extend an existing area to a new end address.
@@ -299,7 +492,17 @@ impl MemorySet {
     /// zeros and have the same permissions as the area.
     #[allow(unused)]
     pub fn append_to(&mut self, start: VirtAddr, new_end: VirtAddr) -> bool {
-        todo!("mm::MemorySet::append_to")
+        if let Some(area) = self
+            .areas
+            .iter_mut()
+            .find(|area| area.vpn_range.get_start() == start.floor())
+        {
+            // Propagate frame-allocation failure back to the `sbrk` path.
+            area.append_to(&mut self.page_table, new_end.ceil())
+                .is_some()
+        } else {
+            false
+        }
     }
 }
 
