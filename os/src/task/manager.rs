@@ -39,7 +39,18 @@ impl TaskManager {
     /// of the remaining processes. Leave the selected process `Ready`;
     /// `run_tasks` owns the transition to `Running` and the context switch.
     pub fn fetch(&mut self) -> Option<Arc<TaskControlBlock>> {
-        todo!("task::TaskManager::fetch")
+        let index = self
+            .ready_queue
+            .iter()
+            .enumerate()
+            .min_by_key(|(_, task)| task.inner_exclusive_access().stride)?
+            .0;
+        let task = self.ready_queue.remove(index)?;
+        {
+            let mut inner = task.inner_exclusive_access();
+            inner.stride += BIG_STRIDE / inner.prio;
+        }
+        Some(task)
     }
 }
 
