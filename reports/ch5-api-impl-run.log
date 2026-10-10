@@ -1,0 +1,780 @@
+########## ch5-api acceptance: make run BASE=2 -> ch5b_usertest ##########
+rustup not found; assuming the Nix dev shell provides riscv64gc-unknown-none-elf and cargo-binutils.
+make[1]: Entering directory '/home/starryreverie/userdata/development/rCore-Tutorial-Code-2026A/user'
+     Removed 843 files, 8.3MiB total
+target/riscv64gc-unknown-none-elf/release/ch2b_bad_address target/riscv64gc-unknown-none-elf/release/ch2b_bad_instructions target/riscv64gc-unknown-none-elf/release/ch2b_bad_register target/riscv64gc-unknown-none-elf/release/ch2b_hello_world target/riscv64gc-unknown-none-elf/release/ch2b_power_3 target/riscv64gc-unknown-none-elf/release/ch2b_power_5 target/riscv64gc-unknown-none-elf/release/ch2b_power_7 target/riscv64gc-unknown-none-elf/release/ch3b_yield0 target/riscv64gc-unknown-none-elf/release/ch3b_yield1 target/riscv64gc-unknown-none-elf/release/ch3b_yield2 target/riscv64gc-unknown-none-elf/release/ch3_sleep1 target/riscv64gc-unknown-none-elf/release/ch3_sleep target/riscv64gc-unknown-none-elf/release/ch3_trace target/riscv64gc-unknown-none-elf/release/ch4b_sbrk target/riscv64gc-unknown-none-elf/release/ch4_mmap0 target/riscv64gc-unknown-none-elf/release/ch4_mmap1 target/riscv64gc-unknown-none-elf/release/ch4_mmap2 target/riscv64gc-unknown-none-elf/release/ch4_mmap3 target/riscv64gc-unknown-none-elf/release/ch4_trace1 target/riscv64gc-unknown-none-elf/release/ch4_unmap2 target/riscv64gc-unknown-none-elf/release/ch4_unmap target/riscv64gc-unknown-none-elf/release/ch5b_exit target/riscv64gc-unknown-none-elf/release/ch5b_forktest2 target/riscv64gc-unknown-none-elf/release/ch5b_forktest target/riscv64gc-unknown-none-elf/release/ch5b_forktest_simple target/riscv64gc-unknown-none-elf/release/ch5b_forktree target/riscv64gc-unknown-none-elf/release/ch5b_initproc target/riscv64gc-unknown-none-elf/release/ch5b_user_shell target/riscv64gc-unknown-none-elf/release/ch5b_usertest target/riscv64gc-unknown-none-elf/release/ch5_exit0 target/riscv64gc-unknown-none-elf/release/ch5_exit1 target/riscv64gc-unknown-none-elf/release/ch5_getpid target/riscv64gc-unknown-none-elf/release/ch5_setprio target/riscv64gc-unknown-none-elf/release/ch5_spawn0 target/riscv64gc-unknown-none-elf/release/ch5_spawn1 target/riscv64gc-unknown-none-elf/release/ch5_stride0 target/riscv64gc-unknown-none-elf/release/ch5_stride1 target/riscv64gc-unknown-none-elf/release/ch5_stride2 target/riscv64gc-unknown-none-elf/release/ch5_stride3 target/riscv64gc-unknown-none-elf/release/ch5_stride4 target/riscv64gc-unknown-none-elf/release/ch5_stride5 target/riscv64gc-unknown-none-elf/release/ch5_stride target/riscv64gc-unknown-none-elf/release/ch5_usertest
+   Compiling scopeguard v1.2.0
+   Compiling spin v0.7.2
+   Compiling bitflags v1.3.2
+   Compiling lock_api v0.4.6
+   Compiling buddy_system_allocator v0.6.0
+   Compiling spin v0.9.9
+   Compiling lazy_static v1.5.1
+   Compiling user_lib v0.1.0 (/home/starryreverie/userdata/development/rCore-Tutorial-Code-2026A/user)
+warning: creating a mutable reference to mutable static is discouraged
+  --> src/bin/ch8b_race_adder.rs:18:17
+   |
+18 |         let a = &mut A as *mut usize;
+   |                 ^^^^^^ mutable reference to mutable static
+   |
+   = note: for more information, see issue #114447 <https://github.com/rust-lang/rust/issues/114447>
+   = note: this will be a hard error in the 2024 edition
+   = note: this mutable reference has lifetime `'static`, but if the static gets accessed (read or written) by any other means, or any other reference is created, then any further use of this mutable reference is Undefined Behavior
+   = note: `#[warn(static_mut_refs)]` on by default
+help: use `addr_of_mut!` instead to create a raw pointer
+   |
+18 |         let a = addr_of_mut!(A) as *mut usize;
+   |                 ~~~~~~~~~~~~~~~
+
+warning: `user_lib` (bin "ch8b_race_adder") generated 1 warning
+warning: unused import: `get_time`
+  --> src/bin/ch7b_pipe_large_test.rs:10:29
+   |
+10 | use user_lib::{close, fork, get_time, pipe, read, wait, write,getpid};
+   |                             ^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: Rust ABI is unsupported in naked functions
+   --> src/bin/ch8b_stackful_coroutine.rs:259:1
+    |
+259 | unsafe fn switch(old: *mut TaskContext, new: *const TaskContext) {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(undefined_naked_function_abi)]` on by default
+
+warning: field `id` is never read
+  --> src/bin/ch8b_stackful_coroutine.rs:36:5
+   |
+35 | struct Task {
+   |        ---- field in this struct
+36 |     id: usize,
+   |     ^^
+   |
+   = note: `#[warn(dead_code)]` on by default
+
+warning: creating a mutable reference to mutable static is discouraged
+  --> src/bin/ch8b_race_adder_atomic.rs:26:17
+   |
+26 |         let a = &mut A as *mut usize;
+   |                 ^^^^^^ mutable reference to mutable static
+   |
+   = note: for more information, see issue #114447 <https://github.com/rust-lang/rust/issues/114447>
+   = note: this will be a hard error in the 2024 edition
+   = note: this mutable reference has lifetime `'static`, but if the static gets accessed (read or written) by any other means, or any other reference is created, then any further use of this mutable reference is Undefined Behavior
+   = note: `#[warn(static_mut_refs)]` on by default
+help: use `addr_of_mut!` instead to create a raw pointer
+   |
+26 |         let a = addr_of_mut!(A) as *mut usize;
+   |                 ~~~~~~~~~~~~~~~
+
+warning: creating a mutable reference to mutable static is discouraged
+  --> src/bin/ch8b_race_adder_loop.rs:24:17
+   |
+24 |         let a = &mut A as *mut usize;
+   |                 ^^^^^^ mutable reference to mutable static
+   |
+   = note: for more information, see issue #114447 <https://github.com/rust-lang/rust/issues/114447>
+   = note: this will be a hard error in the 2024 edition
+   = note: this mutable reference has lifetime `'static`, but if the static gets accessed (read or written) by any other means, or any other reference is created, then any further use of this mutable reference is Undefined Behavior
+   = note: `#[warn(static_mut_refs)]` on by default
+help: use `addr_of_mut!` instead to create a raw pointer
+   |
+24 |         let a = addr_of_mut!(A) as *mut usize;
+   |                 ~~~~~~~~~~~~~~~
+
+warning: creating a mutable reference to mutable static is discouraged
+  --> src/bin/ch8b_race_adder_mutex_spin.rs:20:17
+   |
+20 |         let a = &mut A as *mut usize;
+   |                 ^^^^^^ mutable reference to mutable static
+   |
+   = note: for more information, see issue #114447 <https://github.com/rust-lang/rust/issues/114447>
+   = note: this will be a hard error in the 2024 edition
+   = note: this mutable reference has lifetime `'static`, but if the static gets accessed (read or written) by any other means, or any other reference is created, then any further use of this mutable reference is Undefined Behavior
+   = note: `#[warn(static_mut_refs)]` on by default
+help: use `addr_of_mut!` instead to create a raw pointer
+   |
+20 |         let a = addr_of_mut!(A) as *mut usize;
+   |                 ~~~~~~~~~~~~~~~
+
+warning: `user_lib` (bin "ch7b_pipe_large_test") generated 1 warning (run `cargo fix --bin "ch7b_pipe_large_test"` to apply 1 suggestion)
+warning: `user_lib` (bin "ch8b_stackful_coroutine") generated 2 warnings
+warning: `user_lib` (bin "ch8b_race_adder_atomic") generated 1 warning
+warning: `user_lib` (bin "ch8b_race_adder_loop") generated 1 warning
+warning: `user_lib` (bin "ch8b_race_adder_mutex_spin") generated 1 warning
+    Finished `release` profile [optimized] target(s) in 2.14s
+make[1]: Leaving directory '/home/starryreverie/userdata/development/rCore-Tutorial-Code-2026A/user'
+Platform: qemu
+   Compiling os v0.1.0 (/home/starryreverie/userdata/development/rCore-Tutorial-Code-2026A/os)
+    Finished `release` profile [optimized] target(s) in 0.45s
+[rustsbi] RustSBI version 0.3.0-alpha.2, adapting to RISC-V SBI v1.0.0
+.______       __    __      _______.___________.  _______..______   __
+|   _  \     |  |  |  |    /       |           | /       ||   _  \ |  |
+|  |_)  |    |  |  |  |   |   (----`---|  |----`|   (----`|  |_)  ||  |
+|      /     |  |  |  |    \   \       |  |      \   \    |   _  < |  |
+|  |\  \----.|  `--'  |.----)   |      |  |  .----)   |   |  |_)  ||  |
+| _| `._____| \______/ |_______/       |__|  |_______/    |______/ |__|
+[rustsbi] Implementation     : RustSBI-QEMU Version 0.2.0-alpha.2
+[rustsbi] Platform Name      : riscv-virtio,qemu
+[rustsbi] Platform SMP       : 1
+[rustsbi] Platform Memory    : 0x80000000..0x88000000
+[rustsbi] Boot HART          : 0
+[rustsbi] Device Tree Region : 0x87000000..0x87000ef2
+[rustsbi] Firmware Address   : 0x80000000
+[rustsbi] Supervisor Address : 0x80200000
+[rustsbi] pmp01: 0x00000000..0x80000000 (-wr)
+[rustsbi] pmp02: 0x80000000..0x80200000 (---)
+[rustsbi] pmp03: 0x80200000..0x88000000 (xwr)
+[rustsbi] pmp04: 0x88000000..0x00000000 (-wr)
+[kernel] Hello, world!
+remap_test passed!
+after initproc!
+/**** APPS ****
+ch2b_bad_address
+ch2b_bad_instructions
+ch2b_bad_register
+ch2b_hello_world
+ch2b_power_3
+ch2b_power_5
+ch2b_power_7
+ch3_sleep
+ch3_sleep1
+ch3_trace
+ch3b_yield0
+ch3b_yield1
+ch3b_yield2
+ch4_mmap0
+ch4_mmap1
+ch4_mmap2
+ch4_mmap3
+ch4_trace1
+ch4_unmap
+ch4_unmap2
+ch4b_sbrk
+ch5_exit0
+ch5_exit1
+ch5_getpid
+ch5_setprio
+ch5_spawn0
+ch5_spawn1
+ch5_stride
+ch5_stride0
+ch5_stride1
+ch5_stride2
+ch5_stride3
+ch5_stride4
+ch5_stride5
+ch5_usertest
+ch5b_exit
+ch5b_forktest
+ch5b_forktest2
+ch5b_forktest_simple
+ch5b_forktree
+ch5b_initproc
+ch5b_user_shell
+ch5b_usertest
+**************/
+Rust user shell
+>> ch5b_usertest
+Usertests: Running ch2b_hello_world 
+Usertests: Running ch2b_power_3 
+Usertests: Running ch2b_power_5 
+Usertests: Running ch2b_power_7 
+Usertests: Running ch3b_yield0 
+Usertests: Running ch3b_yield1 
+Usertests: Running ch3b_yield2 
+Usertests: Running ch4b_sbrk 
+Usertests: Running ch5b_exit 
+Usertests: Running ch5b_forktest_simple 
+Usertests: Running ch5b_forktest 
+Hello, world from user mode program!
+power_3 [10000/200000]
+power_3 [20000/200000]
+power_3 [30000/200000]
+power_3 [40000/200000]
+power_3 [50000/200000]
+power_3 [60000/200000]
+power_3 [70000/200000]
+power_5 [10000/140000]
+power_5 [20000/140000]
+power_5 [30000/140000]
+power_5 [40000/140000]
+power_5 [50000/140000]
+power_5 [60000/140000]
+power_5 [70000/140000]
+power_5 [80000/140000]
+power_5 [90000/140000]
+power_5 [100000/140000]
+power_5 [110000/140000]
+power_5 [120000/140000]
+power_5 [130000/140000]
+power_5 [140000/140000]
+5^140000 = 386471875(MOD 998244353)
+Test power_5 OK!
+power_7 [10000/160000]
+power_7 [20000/160000]
+power_7 [30000/160000]
+power_7 [40000/160000]
+power_7 [50000/160000]
+power_7 [60000/160000]
+power_7 [70000/160000]
+power_7 [80000/160000]
+power_7 [90000/160000]
+power_7 [100000/160000]
+power_7 [110000/160000]
+power_7 [120000/160000]
+power_7 [130000/160000]
+power_7 [140000/160000]
+power_7 [150000/160000]
+power_7 [160000/160000]
+7^160000 = 667897727(MOD 998244353)
+Test power_7 OK!
+AAAAAAAAAA [1/5]
+BBBBBBBBBB [1/5]
+CCCCCCCCCC [1/5]
+Test sbrk start.
+origin break point = c000
+one page allocated,  break point = d000
+try write to allocated page
+write ok
+10 page allocated,  break point = 17000
+11 page DEALLOCATED,  break point = c000
+try DEALLOCATED more one page, should be failed.
+Test sbrk almost OK!
+now write to deallocated page, should cause page fault.
+I am the parent. Forking the child...
+I am parent, fork a child pid 14
+I am the parent, waiting now..
+sys_wait without child process test passed!
+parent start, pid = 12!
+ready waiting on parent process!
+forked child pid = 16
+forked child pid = 17
+forked child pid = 18
+forked child pid = 19
+forked child pid = 20
+forked child pid = 21
+forked child pid = 22
+forked child pid = 23
+forked child pid = 24
+forked child pid = 25
+forked child pid = 26
+forked child pid = 27
+forked child pid = 28
+forked child pid = 29
+forked child pid = 30
+forked child pid = 31
+forked child pid = 32
+forked child pid = 33
+forked child pid = 34
+forked child pid = 35
+forked child pid = 36
+forked child pid = 37
+forked child pid = 38
+forked child pid = 39
+forked child pid = 40
+forked child pid = 41
+forked child pid = 42
+forked child pid = 43
+forked child pid = 44
+forked child pid = 45
+forked child pid = 46
+forked child pid = 47
+forked child pid = 48
+forked child pid = 49
+forked child pid = 50
+forked child pid = 51
+forked child pid = 52
+forked child pid = 53
+forked child pid = 54
+forked child pid = 55
+I am the child.
+hello child process!
+I am child 0
+I am child 1
+I am child 2
+I am child 3
+I am child 5
+I am child 6
+I am child 7
+I am child 8
+I am child 9
+I am child 10
+I am child 11
+I am child 12
+I am child 13
+I am child 14
+I am child 15
+I am child 16
+I am child 17
+I am child 18
+I am child 19
+I am child 20
+I am child 21
+I am child 22
+I am child 23
+I am child 24
+I am child 25
+I am child 26
+I am child 28
+I am child 29
+I am child 30
+I am child 31
+I am child 32
+I am child 33
+I am child 34
+I am child 35
+I am child 36
+I am child 37
+I am child 38
+I am child 39
+[32mUsertests: Test ch2b_hello_world  in Process 3 exited with code 0[0m
+power_3 [80000/200000]
+power_3 [90000/200000]
+power_3 [100000/200000]
+power_3 [110000/200000]
+power_3 [120000/200000]
+power_3 [130000/200000]
+power_3 [140000/200000]
+power_3 [150000/200000]
+power_3 [160000/200000]
+power_3 [170000/200000]
+power_3 [180000/200000]
+power_3 [190000/200000]
+power_3 [200000/200000]
+3^200000 = 871008973(MOD 998244353)
+Test power_3 OK!
+AAAAAAAAAA [2/5]
+BBBBBBBBBB [2/5]
+CCCCCCCCCC [2/5]
+[kernel] trap_handler:  Exception(StorePageFault) in application, bad addr = 0xc000, bad instruction = 0x5c0, kernel killed it.
+child process pid = 15, exit code = 100
+I am child 4
+I am child 27
+[32mUsertests: Test ch2b_power_3  in Process 4 exited with code 0[0m
+[32mUsertests: Test ch2b_power_5  in Process 5 exited with code 0[0m
+[32mUsertests: Test ch2b_power_7  in Process 6 exited with code 0[0m
+AAAAAAAAAA [3/5]
+BBBBBBBBBB [3/5]
+CCCCCCCCCC [3/5]
+forktest pass.
+AAAAAAAAAA [4/5]
+BBBBBBBBBB [4/5]
+CCCCCCCCCC [4/5]
+AAAAAAAAAA [5/5]
+BBBBBBBBBB [5/5]
+CCCCCCCCCC [5/5]
+Test write A OK!
+Test write B OK!
+Test write C OK!
+[32mUsertests: Test ch3b_yield0  in Process 7 exited with code 0[0m
+[32mUsertests: Test ch3b_yield1  in Process 8 exited with code 0[0m
+[32mUsertests: Test ch3b_yield2  in Process 9 exited with code 0[0m
+[32mUsertests: Test ch4b_sbrk  in Process 10 exited with code -2[0m
+waitpid 14 ok.
+exit pass.
+[32mUsertests: Test ch5b_exit  in Process 11 exited with code 0[0m
+[32mUsertests: Test ch5b_forktest_simple  in Process 12 exited with code 0[0m
+[32mUsertests: Test ch5b_forktest  in Process 13 exited with code 0[0m
+Basic usertests passed!
+Shell: Process 2 exited with code 0
+>> qemu-system-riscv64: terminating on signal 15 from pid 37954 (timeout)
+
+########## ch5-api acceptance: make run BASE=2 -> ch5_usertest ##########
+rustup not found; assuming the Nix dev shell provides riscv64gc-unknown-none-elf and cargo-binutils.
+make[1]: Entering directory '/home/starryreverie/userdata/development/rCore-Tutorial-Code-2026A/user'
+     Removed 843 files, 8.3MiB total
+target/riscv64gc-unknown-none-elf/release/ch2b_bad_address target/riscv64gc-unknown-none-elf/release/ch2b_bad_instructions target/riscv64gc-unknown-none-elf/release/ch2b_bad_register target/riscv64gc-unknown-none-elf/release/ch2b_hello_world target/riscv64gc-unknown-none-elf/release/ch2b_power_3 target/riscv64gc-unknown-none-elf/release/ch2b_power_5 target/riscv64gc-unknown-none-elf/release/ch2b_power_7 target/riscv64gc-unknown-none-elf/release/ch3b_yield0 target/riscv64gc-unknown-none-elf/release/ch3b_yield1 target/riscv64gc-unknown-none-elf/release/ch3b_yield2 target/riscv64gc-unknown-none-elf/release/ch3_sleep1 target/riscv64gc-unknown-none-elf/release/ch3_sleep target/riscv64gc-unknown-none-elf/release/ch3_trace target/riscv64gc-unknown-none-elf/release/ch4b_sbrk target/riscv64gc-unknown-none-elf/release/ch4_mmap0 target/riscv64gc-unknown-none-elf/release/ch4_mmap1 target/riscv64gc-unknown-none-elf/release/ch4_mmap2 target/riscv64gc-unknown-none-elf/release/ch4_mmap3 target/riscv64gc-unknown-none-elf/release/ch4_trace1 target/riscv64gc-unknown-none-elf/release/ch4_unmap2 target/riscv64gc-unknown-none-elf/release/ch4_unmap target/riscv64gc-unknown-none-elf/release/ch5b_exit target/riscv64gc-unknown-none-elf/release/ch5b_forktest2 target/riscv64gc-unknown-none-elf/release/ch5b_forktest target/riscv64gc-unknown-none-elf/release/ch5b_forktest_simple target/riscv64gc-unknown-none-elf/release/ch5b_forktree target/riscv64gc-unknown-none-elf/release/ch5b_initproc target/riscv64gc-unknown-none-elf/release/ch5b_user_shell target/riscv64gc-unknown-none-elf/release/ch5b_usertest target/riscv64gc-unknown-none-elf/release/ch5_exit0 target/riscv64gc-unknown-none-elf/release/ch5_exit1 target/riscv64gc-unknown-none-elf/release/ch5_getpid target/riscv64gc-unknown-none-elf/release/ch5_setprio target/riscv64gc-unknown-none-elf/release/ch5_spawn0 target/riscv64gc-unknown-none-elf/release/ch5_spawn1 target/riscv64gc-unknown-none-elf/release/ch5_stride0 target/riscv64gc-unknown-none-elf/release/ch5_stride1 target/riscv64gc-unknown-none-elf/release/ch5_stride2 target/riscv64gc-unknown-none-elf/release/ch5_stride3 target/riscv64gc-unknown-none-elf/release/ch5_stride4 target/riscv64gc-unknown-none-elf/release/ch5_stride5 target/riscv64gc-unknown-none-elf/release/ch5_stride target/riscv64gc-unknown-none-elf/release/ch5_usertest
+   Compiling scopeguard v1.2.0
+   Compiling spin v0.7.2
+   Compiling bitflags v1.3.2
+   Compiling lock_api v0.4.6
+   Compiling buddy_system_allocator v0.6.0
+   Compiling spin v0.9.9
+   Compiling lazy_static v1.5.1
+   Compiling user_lib v0.1.0 (/home/starryreverie/userdata/development/rCore-Tutorial-Code-2026A/user)
+warning: creating a mutable reference to mutable static is discouraged
+  --> src/bin/ch8b_race_adder_atomic.rs:26:17
+   |
+26 |         let a = &mut A as *mut usize;
+   |                 ^^^^^^ mutable reference to mutable static
+   |
+   = note: for more information, see issue #114447 <https://github.com/rust-lang/rust/issues/114447>
+   = note: this will be a hard error in the 2024 edition
+   = note: this mutable reference has lifetime `'static`, but if the static gets accessed (read or written) by any other means, or any other reference is created, then any further use of this mutable reference is Undefined Behavior
+   = note: `#[warn(static_mut_refs)]` on by default
+help: use `addr_of_mut!` instead to create a raw pointer
+   |
+26 |         let a = addr_of_mut!(A) as *mut usize;
+   |                 ~~~~~~~~~~~~~~~
+
+warning: creating a mutable reference to mutable static is discouraged
+  --> src/bin/ch8b_race_adder_mutex_spin.rs:20:17
+   |
+20 |         let a = &mut A as *mut usize;
+   |                 ^^^^^^ mutable reference to mutable static
+   |
+   = note: for more information, see issue #114447 <https://github.com/rust-lang/rust/issues/114447>
+   = note: this will be a hard error in the 2024 edition
+   = note: this mutable reference has lifetime `'static`, but if the static gets accessed (read or written) by any other means, or any other reference is created, then any further use of this mutable reference is Undefined Behavior
+   = note: `#[warn(static_mut_refs)]` on by default
+help: use `addr_of_mut!` instead to create a raw pointer
+   |
+20 |         let a = addr_of_mut!(A) as *mut usize;
+   |                 ~~~~~~~~~~~~~~~
+
+warning: creating a mutable reference to mutable static is discouraged
+  --> src/bin/ch8b_race_adder_loop.rs:24:17
+   |
+24 |         let a = &mut A as *mut usize;
+   |                 ^^^^^^ mutable reference to mutable static
+   |
+   = note: for more information, see issue #114447 <https://github.com/rust-lang/rust/issues/114447>
+   = note: this will be a hard error in the 2024 edition
+   = note: this mutable reference has lifetime `'static`, but if the static gets accessed (read or written) by any other means, or any other reference is created, then any further use of this mutable reference is Undefined Behavior
+   = note: `#[warn(static_mut_refs)]` on by default
+help: use `addr_of_mut!` instead to create a raw pointer
+   |
+24 |         let a = addr_of_mut!(A) as *mut usize;
+   |                 ~~~~~~~~~~~~~~~
+
+warning: `user_lib` (bin "ch8b_race_adder_atomic") generated 1 warning
+warning: `user_lib` (bin "ch8b_race_adder_mutex_spin") generated 1 warning
+warning: Rust ABI is unsupported in naked functions
+   --> src/bin/ch8b_stackful_coroutine.rs:259:1
+    |
+259 | unsafe fn switch(old: *mut TaskContext, new: *const TaskContext) {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(undefined_naked_function_abi)]` on by default
+
+warning: `user_lib` (bin "ch8b_race_adder_loop") generated 1 warning
+warning: creating a mutable reference to mutable static is discouraged
+  --> src/bin/ch8b_race_adder.rs:18:17
+   |
+18 |         let a = &mut A as *mut usize;
+   |                 ^^^^^^ mutable reference to mutable static
+   |
+   = note: for more information, see issue #114447 <https://github.com/rust-lang/rust/issues/114447>
+   = note: this will be a hard error in the 2024 edition
+   = note: this mutable reference has lifetime `'static`, but if the static gets accessed (read or written) by any other means, or any other reference is created, then any further use of this mutable reference is Undefined Behavior
+   = note: `#[warn(static_mut_refs)]` on by default
+help: use `addr_of_mut!` instead to create a raw pointer
+   |
+18 |         let a = addr_of_mut!(A) as *mut usize;
+   |                 ~~~~~~~~~~~~~~~
+
+warning: unused import: `get_time`
+  --> src/bin/ch7b_pipe_large_test.rs:10:29
+   |
+10 | use user_lib::{close, fork, get_time, pipe, read, wait, write,getpid};
+   |                             ^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: field `id` is never read
+  --> src/bin/ch8b_stackful_coroutine.rs:36:5
+   |
+35 | struct Task {
+   |        ---- field in this struct
+36 |     id: usize,
+   |     ^^
+   |
+   = note: `#[warn(dead_code)]` on by default
+
+warning: `user_lib` (bin "ch8b_race_adder") generated 1 warning
+warning: `user_lib` (bin "ch7b_pipe_large_test") generated 1 warning (run `cargo fix --bin "ch7b_pipe_large_test"` to apply 1 suggestion)
+warning: `user_lib` (bin "ch8b_stackful_coroutine") generated 2 warnings
+    Finished `release` profile [optimized] target(s) in 2.04s
+make[1]: Leaving directory '/home/starryreverie/userdata/development/rCore-Tutorial-Code-2026A/user'
+Platform: qemu
+   Compiling os v0.1.0 (/home/starryreverie/userdata/development/rCore-Tutorial-Code-2026A/os)
+    Finished `release` profile [optimized] target(s) in 0.47s
+[rustsbi] RustSBI version 0.3.0-alpha.2, adapting to RISC-V SBI v1.0.0
+.______       __    __      _______.___________.  _______..______   __
+|   _  \     |  |  |  |    /       |           | /       ||   _  \ |  |
+|  |_)  |    |  |  |  |   |   (----`---|  |----`|   (----`|  |_)  ||  |
+|      /     |  |  |  |    \   \       |  |      \   \    |   _  < |  |
+|  |\  \----.|  `--'  |.----)   |      |  |  .----)   |   |  |_)  ||  |
+| _| `._____| \______/ |_______/       |__|  |_______/    |______/ |__|
+[rustsbi] Implementation     : RustSBI-QEMU Version 0.2.0-alpha.2
+[rustsbi] Platform Name      : riscv-virtio,qemu
+[rustsbi] Platform SMP       : 1
+[rustsbi] Platform Memory    : 0x80000000..0x88000000
+[rustsbi] Boot HART          : 0
+[rustsbi] Device Tree Region : 0x87000000..0x87000ef2
+[rustsbi] Firmware Address   : 0x80000000
+[rustsbi] Supervisor Address : 0x80200000
+[rustsbi] pmp01: 0x00000000..0x80000000 (-wr)
+[rustsbi] pmp02: 0x80000000..0x80200000 (---)
+[rustsbi] pmp03: 0x80200000..0x88000000 (xwr)
+[rustsbi] pmp04: 0x88000000..0x00000000 (-wr)
+[kernel] Hello, world!
+remap_test passed!
+after initproc!
+/**** APPS ****
+ch2b_bad_address
+ch2b_bad_instructions
+ch2b_bad_register
+ch2b_hello_world
+ch2b_power_3
+ch2b_power_5
+ch2b_power_7
+ch3_sleep
+ch3_sleep1
+ch3_trace
+ch3b_yield0
+ch3b_yield1
+ch3b_yield2
+ch4_mmap0
+ch4_mmap1
+ch4_mmap2
+ch4_mmap3
+ch4_trace1
+ch4_unmap
+ch4_unmap2
+ch4b_sbrk
+ch5_exit0
+ch5_exit1
+ch5_getpid
+ch5_setprio
+ch5_spawn0
+ch5_spawn1
+ch5_stride
+ch5_stride0
+ch5_stride1
+ch5_stride2
+ch5_stride3
+ch5_stride4
+ch5_stride5
+ch5_usertest
+ch5b_exit
+ch5b_forktest
+ch5b_forktest2
+ch5b_forktest_simple
+ch5b_forktree
+ch5b_initproc
+ch5b_user_shell
+ch5b_usertest
+**************/
+Rust user shell
+>> ch5_usertest
+Usertests: Running ch2b_hello_world 
+Usertests: Running ch2b_power_3 
+Usertests: Running ch2b_power_5 
+Usertests: Running ch2b_power_7 
+Usertests: Running ch3b_yield0 
+Usertests: Running ch3b_yield1 
+Usertests: Running ch3b_yield2 
+Usertests: Running ch3_sleep 
+Usertests: Running ch3_sleep1 
+Usertests: Running ch4_mmap0 
+Usertests: Running ch4_mmap1 
+Usertests: Running ch4_mmap2 
+Usertests: Running ch4_mmap3 
+Usertests: Running ch4_unmap 
+Usertests: Running ch4_unmap2 
+Usertests: Running ch5_spawn0 
+Usertests: Running ch5_spawn1 
+Usertests: Running ch5_setprio 
+Hello, world from user mode program!
+power_3 [10000/200000]
+power_3 [20000/200000]
+power_3 [30000/200000]
+power_5 [10000/140000]
+power_5 [20000/140000]
+power_5 [30000/140000]
+power_5 [40000/140000]
+power_5 [50000/140000]
+power_5 [60000/140000]
+power_5 [70000/140000]
+power_5 [80000/140000]
+power_5 [90000/140000]
+power_5 [100000/140000]
+power_5 [110000/140000]
+power_5 [120000/140000]
+power_5 [130000/140000]
+power_5 [140000/140000]
+5^140000 = 386471875(MOD 998244353)
+Test power_5 OK!
+power_7 [10000/160000]
+power_7 [20000/160000]
+power_7 [30000/160000]
+power_7 [40000/160000]
+power_7 [50000/160000]
+power_7 [60000/160000]
+power_7 [70000/160000]
+power_7 [80000/160000]
+power_7 [90000/160000]
+power_7 [100000/160000]
+power_7 [110000/160000]
+power_7 [120000/160000]
+power_7 [130000/160000]
+power_7 [140000/160000]
+power_7 [150000/160000]
+power_7 [160000/160000]
+7^160000 = 667897727(MOD 998244353)
+Test power_7 OK!
+AAAAAAAAAA [1/5]
+BBBBBBBBBB [1/5]
+CCCCCCCCCC [1/5]
+get_time OK! 33
+current time_msec = 34
+Test 04_1 OK!
+[kernel] trap_handler:  Exception(StorePageFault) in application, bad addr = 0x10000000, bad instruction = 0x42e, kernel killed it.
+Test 04_4 test OK!
+Test 04_5 ummap OK!
+Test 04_6 ummap2 OK!
+new child 21
+new child 22
+new child 23
+new child 24
+new child 25
+new child 26
+new child 27
+new child 28
+new child 29
+new child 30
+new child 31
+new child 32
+new child 33
+new child 34
+new child 35
+new child 36
+new child 37
+new child 38
+new child 39
+new child 40
+new child 41
+new child 42
+new child 43
+new child 44
+new child 45
+new child 46
+new child 47
+new child 48
+new child 49
+new child 50
+new child 51
+new child 52
+new child 53
+new child 54
+new child 55
+new child 56
+new child 57
+new child 58
+new child 59
+new child 60
+new child 61
+Test set_priority OK!
+Test getpid OK! pid = 21
+Test getpid OK! pid = 22
+Test getpid OK! pid = 23
+Test getpid OK! pid = 24
+Test getpid OK! pid = 25
+Test getpid OK! pid = 26
+Test getpid OK! pid = 27
+Test getpid OK! pid = 28
+Test getpid OK! pid = 29
+Test getpid OK! pid = 30
+Test getpid OK! pid = 31
+Test getpid OK! pid = 32
+Test getpid OK! pid = 33
+Test getpid OK! pid = 35
+Test getpid OK! pid = 36
+Test getpid OK! pid = 37
+Test getpid OK! pid = 38
+Test getpid OK! pid = 39
+Test getpid OK! pid = 40
+Test getpid OK! pid = 41
+Test getpid OK! pid = 42
+Test getpid OK! pid = 43
+Test getpid OK! pid = 44
+Test getpid OK! pid = 45
+Test getpid OK! pid = 46
+Test getpid OK! pid = 47
+Test getpid OK! pid = 48
+Test getpid OK! pid = 49
+Test getpid OK! pid = 50
+Test getpid OK! pid = 51
+Test getpid OK! pid = 52
+Test getpid OK! pid = 53
+Test getpid OK! pid = 54
+Test getpid OK! pid = 55
+Test getpid OK! pid = 56
+Test getpid OK! pid = 57
+Test getpid OK! pid = 58
+Test getpid OK! pid = 59
+Test getpid OK! pid = 60
+power_3 [40000/200000]
+power_3 [50000/200000]
+power_3 [60000/200000]
+power_3 [70000/200000]
+power_3 [80000/200000]
+power_3 [90000/200000]
+power_3 [100000/200000]
+power_3 [110000/200000]
+power_3 [120000/200000]
+power_3 [130000/200000]
+power_3 [140000/200000]
+power_3 [150000/200000]
+power_3 [160000/200000]
+power_3 [170000/200000]
+power_3 [180000/200000]
+power_3 [190000/200000]
+power_3 [200000/200000]
+3^200000 = 871008973(MOD 998244353)
+Test power_3 OK!
+AAAAAAAAAA [2/5]
+BBBBBBBBBB [2/5]
+CCCCCCCCCC [2/5]
+[kernel] trap_handler:  Exception(LoadPageFault) in application, bad addr = 0x10000000, bad instruction = 0x42c, kernel killed it.
+Test wait OK!
+Test getpid OK! pid = 34
+[32mUsertests: Test ch2b_hello_world  in Process 3 exited with code 0[0m
+[32mUsertests: Test ch2b_power_3  in Process 4 exited with code 0[0m
+[32mUsertests: Test ch2b_power_5  in Process 5 exited with code 0[0m
+[32mUsertests: Test ch2b_power_7  in Process 6 exited with code 0[0m
+AAAAAAAAAA [3/5]
+BBBBBBBBBB [3/5]
+CCCCCCCCCC [3/5]
+Test spawn0 OK!
+Test waitpid OK!
+AAAAAAAAAA [4/5]
+BBBBBBBBBB [4/5]
+CCCCCCCCCC [4/5]
+AAAAAAAAAA [5/5]
+BBBBBBBBBB [5/5]
+CCCCCCCCCC [5/5]
+Test write A OK!
+Test write B OK!
+Test write C OK!
+[32mUsertests: Test ch3b_yield0  in Process 7 exited with code 0[0m
+[32mUsertests: Test ch3b_yield1  in Process 8 exited with code 0[0m
+[32mUsertests: Test ch3b_yield2  in Process 9 exited with code 0[0m
+time_msec = 134 after sleeping 100 ticks, delta = 100ms!
+Test sleep1 passed!
+Test sleep OK!
+[32mUsertests: Test ch3_sleep  in Process 10 exited with code 0[0m
+[32mUsertests: Test ch3_sleep1  in Process 11 exited with code 0[0m
+[32mUsertests: Test ch4_mmap0  in Process 12 exited with code 0[0m
+[32mUsertests: Test ch4_mmap1  in Process 13 exited with code -2[0m
+[32mUsertests: Test ch4_mmap2  in Process 14 exited with code -2[0m
+[32mUsertests: Test ch4_mmap3  in Process 15 exited with code 0[0m
+[32mUsertests: Test ch4_unmap  in Process 16 exited with code 0[0m
+[32mUsertests: Test ch4_unmap2  in Process 17 exited with code 0[0m
+[32mUsertests: Test ch5_spawn0  in Process 18 exited with code 0[0m
+[32mUsertests: Test ch5_spawn1  in Process 19 exited with code 0[0m
+[32mUsertests: Test ch5_setprio  in Process 20 exited with code 0[0m
+Usertests: Running ch5_stride 
+priority = 6, exitcode = 19747600, ratio = 3291266
+priority = 7, exitcode = 23051600, ratio = 3293085
+priority = 8, exitcode = 26135200, ratio = 3266900
+priority = 9, exitcode = 29894000, ratio = 3321555
+priority = 5, exitcode = 16585600, ratio = 3317120
+priority = 10, exitcode = 32904000, ratio = 3290400
+[32mUsertests: Test ch5_stride  in Process 20 exited with code 0[0m
+ch5 Usertests passed!
+Shell: Process 2 exited with code 0
+>> qemu-system-riscv64: terminating on signal 15 from pid 40952 (timeout)

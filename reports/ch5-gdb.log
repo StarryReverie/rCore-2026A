@@ -1,0 +1,139 @@
+0x0000000000001000 in ?? ()
+Breakpoint 1 at 0x8021ccf4: file src/syscall/process.rs, line 46.
+
+Breakpoint 1, os::syscall::process::sys_fork () at src/syscall/process.rs:46
+46	    trace!("kernel:pid[{}] sys_fork", current_task().unwrap().pid.0);
+Warning: the current language does not match this frame.
+
+===== [1] breakpoint hit: os::syscall::process::sys_fork =====
+#0  os::syscall::process::sys_fork () at src/syscall/process.rs:46
+#1  0x0000000080219b3e in os::syscall::syscall (syscall_id=220, args=...) at src/syscall/mod.rs:54
+#2  0x00000000802126e4 in os::trap::trap_handler () at src/trap/mod.rs:72
+#3  0x0000000000002f26 in ?? ()
+pc             0x8021ccf4	0x8021ccf4 <os::syscall::process::sys_fork+10>
+sp             0xffffffffffffe760	0xffffffffffffe760
+Breakpoint 2 at 0x8021cdc0: file src/syscall/process.rs, line 54.
+
+Breakpoint 2, os::syscall::process::sys_fork () at src/syscall/process.rs:54
+54	    trap_cx.x[10] = 0;
+
+===== [2] back in sys_fork after TaskControlBlock::fork(), before child a0 reset =====
+#0  os::syscall::process::sys_fork () at src/syscall/process.rs:54
+#1  0x0000000080219b3e in os::syscall::syscall (syscall_id=220, args=...) at src/syscall/mod.rs:54
+#2  0x00000000802126e4 in os::trap::trap_handler () at src/trap/mod.rs:72
+#3  0x0000000000002f26 in ?? ()
+trap_cx = 0x8300e000
+new_pid = 1
+new_task = {ptr = {pointer = 0x80f8a400 <os::mm::heap_allocator::HEAP_SPACE+4824>}, phantom = {<No data fields>}, alloc = {<No data fields>}}
+current_task = {ptr = {pointer = 0x82f88600 <os::mm::heap_allocator::HEAP_SPACE+33551576>}, phantom = {<No data fields>}, alloc = {<No data fields>}}
+
+-- parent pid = $1 = 0
+-- child  pid = $2 = 1
+-- child kernel_stack id = $3 = 1
+-- child task_cx (goto trap_return) = $4 = os::task::context::TaskContext {ra: 2149656342, sp: 18446744073709477888, s: [0 <repeats 12 times>]}
+
+-- child TrapContext copied from parent --
+$5 = {x = {0, 12070, 81248, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6148914689804861440, 6148914689804861440, 0, 0, 220, 0 <repeats 14 times>}, sstatus = {bits = 8589934592}, sepc = 11908, kernel_satp = 9223372036855312266, kernel_sp = 18446744073709477888, trap_handler = 2149654706}
+-- child trap_cx kernel_sp = 0xfffffffffffee000
+-- child trap_cx x[10] BEFORE reset = 0
+56	    add_task(new_task);
+-- child trap_cx x[10] AFTER reset  = 0  (fork returns 0 in child)
+[Inferior 1 (process 1) killed]
+0x0000000000001000 in ?? ()
+Breakpoint 1 at 0x80223c02: file src/task/manager.rs, line 35.
+Warning: the current language does not match this frame.
+
+===== TaskManager::fetch selection #1 =====
+-- call stack: idle loop -> fetch_task -> TaskManager::fetch --
+#0  os::task::manager::TaskManager::fetch (self=0x82f89290 <<os::task::manager::TASK_MANAGER as core::ops::deref::Deref>::deref::__stability::LAZY+8>) at src/task/manager.rs:35
+#1  0x0000000080223d5e in os::task::manager::fetch_task () at src/task/manager.rs:57
+#2  0x0000000080219f46 in os::task::processor::run_tasks () at src/task/processor.rs:58
+#3  0x000000008021425e in os::rust_main () at src/main.rs:113
+#4  0x0000000080200010 in stext ()
+Backtrace stopped: frame did not save the PC
+$1 = 0
+$2 = 0
+$3 = 0
+$4 = 16
+
+===== TaskManager::fetch selection #2 =====
+$5 = 0
+$6 = 1
+$7 = 0
+$8 = 16
+
+===== TaskManager::fetch selection #3 =====
+$9 = 0
+$10 = 0
+$11 = 4096
+$12 = 16
+
+===== TaskManager::fetch selection #4 =====
+$13 = 0
+$14 = 1
+$15 = 4096
+$16 = 16
+
+===== TaskManager::fetch selection #5 =====
+$17 = 0
+$18 = 0
+$19 = 8192
+$20 = 16
+
+===== TaskManager::fetch selection #6 =====
+$21 = 0
+$22 = 1
+$23 = 8192
+$24 = 16
+
+===== TaskManager::fetch selection #7 =====
+$25 = 0
+$26 = 0
+$27 = 12288
+$28 = 16
+
+===== TaskManager::fetch selection #8 =====
+$29 = 0
+$30 = 1
+$31 = 12288
+$32 = 16
+
+(stop after 8 selections; each later selected process is charged BIG_STRIDE/prio)
+[Inferior 1 (process 1) killed]
+0x0000000000001000 in ?? ()
+Breakpoint 1 at 0x802111a2: file src/task/task.rs, line 171.
+Warning: the current language does not match this frame.
+
+===== TaskControlBlock::exec: replace user program in place =====
+#0  os::task::task::TaskControlBlock::exec (self=0x80f8a410 <os::mm::heap_allocator::HEAP_SPACE+4840>, elf_data=...) at src/task/task.rs:171
+#1  0x000000008021d112 in os::syscall::process::sys_exec (path=0x9030 <error: Cannot access memory at address 0x9030>) at src/syscall/process.rs:66
+#2  0x0000000080219b52 in os::syscall::syscall (syscall_id=221, args=...) at src/syscall/mod.rs:55
+#3  0x00000000802126e4 in os::trap::trap_handler () at src/trap/mod.rs:72
+#4  0x0000000000002f56 in ?? ()
+$1 = 1
+$2 = 0
+$3 = 86016
+$4 = os::mm::address::PhysPageNum (536632)
+[Inferior 1 (process 1) killed]
+0x0000000000001000 in ?? ()
+Breakpoint 1 at 0x802196e6: file src/task/mod.rs, line 79.
+Breakpoint 2 at 0x8021d4ba: file src/syscall/process.rs, line 103.
+Warning: the current language does not match this frame.
+
+===== exit_current_and_run_next: process becomes Zombie =====
+#0  os::task::exit_current_and_run_next (exit_code=0) at src/task/mod.rs:79
+#1  0x000000008021c88c in os::syscall::process::sys_exit (exit_code=0) at src/syscall/process.rs:29
+#2  0x0000000080219b1a in os::syscall::syscall (syscall_id=93, args=...) at src/syscall/mod.rs:51
+#3  0x00000000802126e4 in os::trap::trap_handler () at src/trap/mod.rs:72
+#4  0x0000000000002da4 in ?? ()
+$1 = 3
+$2 = 0
+
+===== sys_waitpid reaps one Zombie child =====
+#0  os::syscall::process::sys_waitpid (pid=12, exit_code_ptr=0x13da4) at src/syscall/process.rs:103
+#1  0x0000000080219b68 in os::syscall::syscall (syscall_id=260, args=...) at src/syscall/mod.rs:56
+#2  0x00000000802126e4 in os::trap::trap_handler () at src/trap/mod.rs:72
+#3  0x0000000000003204 in ?? ()
+$3 = 12
+$4 = -66436
+[Inferior 1 (process 1) killed]
