@@ -1,0 +1,1 @@
+{"schema":"course-log-v1","id":"d0908284-8897-4baf-b9d6-1a393e2aa4d5","timestamp":"2026-10-10T13:39:45.653Z","session":"","type":"ai_command_result","actor":"ai","source":"ai-adapter","command":"kill 178156 178157 2>/dev/null; sleep 1; ps -eo pid,args | grep -i 'qemu-system' | grep -v grep || echo \"(no qemu running)\"","cwd":".","exit_code":0,"duration_ms":1035,"tool":"pi"}

@@ -1,0 +1,1 @@
+{"schema":"course-log-v1","id":"1fea086d-5b52-4a62-bd25-2ffdc1daa68c","timestamp":"2026-10-10T13:30:37.392Z","session":"","type":"ai_file_operation","actor":"ai","source":"ai-adapter","file":"os/src/fs/inode.rs","tool":"pi","operation":"edit","confidence":"high"}
