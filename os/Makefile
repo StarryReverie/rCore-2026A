@@ -33,14 +33,24 @@ DISASM ?= -x
 # Run usertests or usershell
 TEST ?=
 
+# Debugger. NixOS ships a multiarch `gdb` but not `riscv64-unknown-elf-gdb`;
+# override with `make ... GDB=gdb` in that environment.
+GDB ?= riscv64-unknown-elf-gdb
+
 build: env $(KERNEL_BIN)
 
+# Install toolchain pieces with rustup when it exists. On NixOS the dev shell
+# already provides the target, rust-src and cargo-binutils, so this is a no-op.
 env:
 ifeq ($(OFFLINE),)
-	(rustup target list | grep "riscv64gc-unknown-none-elf (installed)") || rustup target add $(TARGET)
-	cargo install cargo-binutils --locked
-	rustup component add rust-src
-	rustup component add llvm-tools-preview
+	@if command -v rustup >/dev/null 2>&1; then \
+		(rustup target list | grep "$(TARGET) (installed)") || rustup target add $(TARGET); \
+		rustup component add rust-src; \
+		rustup component add llvm-tools-preview; \
+	else \
+		echo "rustup not found; assuming the Nix dev shell provides $(TARGET) and cargo-binutils."; \
+	fi
+	@command -v rust-objcopy >/dev/null 2>&1 || cargo install cargo-binutils --locked
 endif
 
 $(KERNEL_BIN): kernel
@@ -74,13 +84,13 @@ run-inner: build
 debug: build
 	@tmux new-session -d \
 		"qemu-system-riscv64 -machine virt -nographic -bios $(BOOTLOADER) -device loader,file=$(KERNEL_BIN),addr=$(KERNEL_ENTRY_PA) -s -S" && \
-		tmux split-window -h "riscv64-unknown-elf-gdb -ex 'file $(KERNEL_ELF)' -ex 'set arch riscv:rv64' -ex 'target remote localhost:1234'" && \
+		tmux split-window -h "$(GDB) -ex 'file $(KERNEL_ELF)' -ex 'set arch riscv:rv64' -ex 'target remote localhost:1234'" && \
 		tmux -2 attach-session -d
 
 gdbserver: build
 	@qemu-system-riscv64 -machine virt -nographic -bios $(BOOTLOADER) -device loader,file=$(KERNEL_BIN),addr=$(KERNEL_ENTRY_PA) -s -S
 
 gdbclient:
-	@riscv64-unknown-elf-gdb -ex 'file $(KERNEL_ELF)' -ex 'set arch riscv:rv64' -ex 'target remote localhost:1234'
+	@$(GDB) -ex 'file $(KERNEL_ELF)' -ex 'set arch riscv:rv64' -ex 'target remote localhost:1234'
 
 .PHONY: build env kernel clean disasm disasm-vim run-inner gdbserver gdbclient
