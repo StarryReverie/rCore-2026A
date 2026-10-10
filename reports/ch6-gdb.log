@@ -1,0 +1,228 @@
+0x0000000000001000 in ?? ()
+
+########## Scene A: boot-time program loading ##########
+Temporary breakpoint 1 at 0x8021af1e: file src/fs/inode.rs, line 106.
+
+Temporary breakpoint 1, os::fs::inode::open_file (name=..., flags=...) at src/fs/inode.rs:106
+106	    let (readable, writable) = flags.read_write();
+Warning: the current language does not match this frame.
+
+===== [A1] os::fs::inode::open_file (initial program) =====
+#0  os::fs::inode::open_file (name=..., flags=...) at src/fs/inode.rs:106
+#1  0x0000000080222052 in os::task::{impl#0}::deref::__static_ref_initialize () at src/task/mod.rs:113
+#2  core::ops::function::FnOnce::call_once<fn() -> alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>, ()> () at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/ops/function.rs:250
+#3  0x000000008020778e in spin::once::{impl#4}::call_once::{closure#0}<alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>, spin::relax::Spin, fn() -> alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>> () at /home/starryreverie/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.9/src/once.rs:174
+#4  0x00000000802055d4 in spin::once::Once<alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>, spin::relax::Spin>::try_call_once_slow<alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>, spin::relax::Spin, spin::once::{impl#4}::call_once::{closure_env#0}<alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>, spin::relax::Spin, fn() -> alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>>, core::convert::Infallible> (self=0x822651b0 <<os::task::INITPROC as core::ops::deref::Deref>::deref::__stability::LAZY>, f=...) at /home/starryreverie/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.9/src/once.rs:260
+$1 = {bits = 0}
+$2 = "ch6b_initproc"
+Temporary breakpoint 2 at 0x802358f4: file src/vfs.rs, line 75.
+
+Temporary breakpoint 2, easy_fs::vfs::Inode::find (self=0x82264c10 <os::mm::heap_allocator::HEAP_SPACE+33553424>, name=...) at src/vfs.rs:75
+75	        let fs = self.fs.lock();
+
+===== [A2] easy_fs::vfs::Inode::find =====
+#0  easy_fs::vfs::Inode::find (self=0x82264c10 <os::mm::heap_allocator::HEAP_SPACE+33553424>, name=...) at src/vfs.rs:75
+#1  0x000000008021af7c in os::fs::inode::open_file (name=..., flags=...) at src/fs/inode.rs:119
+#2  0x0000000080222052 in os::task::{impl#0}::deref::__static_ref_initialize () at src/task/mod.rs:113
+#3  core::ops::function::FnOnce::call_once<fn() -> alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>, ()> () at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/ops/function.rs:250
+$3 = "ch6b_initproc"
+Temporary breakpoint 3 at 0x8021abd2: file src/fs/inode.rs, line 42.
+
+Temporary breakpoint 3, os::fs::inode::OSInode::read_all (self=0x82264c50 <os::mm::heap_allocator::HEAP_SPACE+33553488>) at src/fs/inode.rs:42
+42	        let mut inner = self.inner.exclusive_access();
+
+===== [A3] OSInode::read_all (load whole ELF) =====
+#0  os::fs::inode::OSInode::read_all (self=0x82264c50 <os::mm::heap_allocator::HEAP_SPACE+33553488>) at src/fs/inode.rs:42
+#1  0x000000008022209c in os::task::{impl#0}::deref::__static_ref_initialize () at src/task/mod.rs:114
+#2  core::ops::function::FnOnce::call_once<fn() -> alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>, ()> () at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/ops/function.rs:250
+#3  0x000000008020778e in spin::once::{impl#4}::call_once::{closure#0}<alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>, spin::relax::Spin, fn() -> alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>> () at /home/starryreverie/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.9/src/once.rs:174
+#4  0x00000000802055d4 in spin::once::Once<alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>, spin::relax::Spin>::try_call_once_slow<alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>, spin::relax::Spin, spin::once::{impl#4}::call_once::{closure_env#0}<alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>, spin::relax::Spin, fn() -> alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>>, core::convert::Infallible> (self=0x822651b0 <<os::task::INITPROC as core::ops::deref::Deref>::deref::__stability::LAZY>, f=...) at /home/starryreverie/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.9/src/once.rs:260
+#5  0x00000000802051be in spin::once::Once<alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>, spin::relax::Spin>::try_call_once<alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>, spin::relax::Spin, spin::once::{impl#4}::call_once::{closure_env#0}<alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>, spin::relax::Spin, fn() -> alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>>, core::convert::Infallible> (self=0x822651b0 <<os::task::INITPROC as core::ops::deref::Deref>::deref::__stability::LAZY>, f=...) at /home/starryreverie/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.9/src/once.rs:217
+$4 = os::fs::inode::OSInode {readable: true, writable: false, inner: os::sync::up::UPSafeCell<os::fs::inode::OSInodeInner> {inner: core::cell::RefCell<os::fs::inode::OSInodeInner> {borrow: core::cell::Cell<isize> {value: core::cell::UnsafeCell<isize> {value: 0}}, value: core::cell::UnsafeCell<os::fs::inode::OSInodeInner> {value: os::fs::inode::OSInodeInner {offset: 0, inode: alloc::sync::Arc<easy_fs::vfs::Inode, alloc::alloc::Global> {ptr: core::ptr::non_null::NonNull<alloc::sync::ArcInner<easy_fs::vfs::Inode>> {pointer: 0x822640c0 <os::mm::heap_allocator::HEAP_SPACE+33550528>}, phantom: core::marker::PhantomData<alloc::sync::ArcInner<easy_fs::vfs::Inode>>, alloc: alloc::alloc::Global}}}}}}
+Temporary breakpoint 4 at 0x802369b4: file src/vfs.rs, line 277.
+
+Temporary breakpoint 4, easy_fs::vfs::Inode::read_at (self=0x822640d0 <os::mm::heap_allocator::HEAP_SPACE+33550544>, offset=0, buf=...) at src/vfs.rs:277
+277	        let _fs = self.fs.lock();
+
+===== [A4] easy_fs::vfs::Inode::read_at =====
+#0  easy_fs::vfs::Inode::read_at (self=0x822640d0 <os::mm::heap_allocator::HEAP_SPACE+33550544>, offset=0, buf=...) at src/vfs.rs:277
+#1  0x000000008021ac6a in os::fs::inode::OSInode::read_all (self=0x82264c50 <os::mm::heap_allocator::HEAP_SPACE+33553488>) at src/fs/inode.rs:47
+#2  0x000000008022209c in os::task::{impl#0}::deref::__static_ref_initialize () at src/task/mod.rs:114
+#3  core::ops::function::FnOnce::call_once<fn() -> alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>, ()> () at /rustc/c987ad527540e8f1565f57c31204bde33f63df76/library/core/src/ops/function.rs:250
+#4  0x000000008020778e in spin::once::{impl#4}::call_once::{closure#0}<alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>, spin::relax::Spin, fn() -> alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>> () at /home/starryreverie/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.9/src/once.rs:174
+#5  0x00000000802055d4 in spin::once::Once<alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>, spin::relax::Spin>::try_call_once_slow<alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>, spin::relax::Spin, spin::once::{impl#4}::call_once::{closure_env#0}<alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>, spin::relax::Spin, fn() -> alloc::sync::Arc<os::task::task::TaskControlBlock, alloc::alloc::Global>>, core::convert::Infallible> (self=0x822651b0 <<os::task::INITPROC as core::ops::deref::Deref>::deref::__stability::LAZY>, f=...) at /home/starryreverie/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.9/src/once.rs:260
+$5 = 0
+[Inferior 1 (process 1) killed]
+0x0000000000001000 in ?? ()
+
+########## Scene B: file operations (ch6_file0 x2, ch6_file2) ##########
+Breakpoint 1 at 0x80235d78: file src/vfs.rs, line 136.
+Breakpoint 2 at 0x80236bb0: file src/vfs.rs, line 292.
+Breakpoint 3 at 0x80236aac: file src/vfs.rs, line 282.
+Breakpoint 4 at 0x80235a0a: file src/vfs.rs, line 95.
+Breakpoint 5 at 0x80236088: file src/vfs.rs, line 201.
+Breakpoint 6 at 0x8023559c: file src/vfs.rs, line 46.
+Breakpoint 7 at 0x802364d6: file src/vfs.rs, line 233.
+Warning: the current language does not match this frame.
+
+===== [B] Inode::create #1 =====
+#0  easy_fs::vfs::Inode::create (self=0x82264c10 <os::mm::heap_allocator::HEAP_SPACE+33553424>, name=...) at src/vfs.rs:136
+#1  0x000000008021b06a in os::fs::inode::open_file (name=..., flags=...) at src/fs/inode.rs:114
+#2  0x000000008020287a in os::syscall::fs::sys_open (path=0x42cd <error: Cannot access memory at address 0x42cd>, flags=513) at src/syscall/fs.rs:58
+#3  0x000000008021c966 in os::syscall::syscall (syscall_id=56, args=...) at src/syscall/mod.rs:63
+$1 = "fname"
+
+===== [B] Inode::increase_size #1 =====
+#0  easy_fs::vfs::Inode::increase_size (self=0x82264c10 <os::mm::heap_allocator::HEAP_SPACE+33553424>, new_size=1728, disk_inode=0x80266830 <os::mm::heap_allocator::HEAP_SPACE+6192>, fs=0xfffffffffffdc4d0) at src/vfs.rs:95
+#1  0x0000000080235d1a in easy_fs::vfs::Inode::append_dirent (self=0x82264c10 <os::mm::heap_allocator::HEAP_SPACE+33553424>, name=..., inode_id=54, disk_inode=0x80266830 <os::mm::heap_allocator::HEAP_SPACE+6192>, fs=0xfffffffffffdc4d0) at src/vfs.rs:126
+#2  0x000000008023b360 in easy_fs::vfs::{impl#0}::create::{closure#2} (root_inode=0x80266830 <os::mm::heap_allocator::HEAP_SPACE+6192>) at src/vfs.rs:157
+$2 = 1728
+
+===== [B] Inode::write_at #1 =====
+#0  easy_fs::vfs::Inode::write_at (self=0x82262190 <os::mm::heap_allocator::HEAP_SPACE+33542544>, offset=0, buf=...) at src/vfs.rs:282
+#1  0x000000008021b502 in os::fs::inode::{impl#2}::write (self=0x822640d0 <os::mm::heap_allocator::HEAP_SPACE+33550544>, buf=...) at src/fs/inode.rs:176
+#2  0x0000000080202314 in os::syscall::fs::sys_write (fd=3, buf=0x42c0 <error: Cannot access memory at address 0x42c0>, len=13) at src/syscall/fs.rs:25
+#3  0x000000008021c9d4 in os::syscall::syscall (syscall_id=64, args=...) at src/syscall/mod.rs:68
+$3 = 0
+
+===== [B] Inode::increase_size #2 =====
+#0  easy_fs::vfs::Inode::increase_size (self=0x82262190 <os::mm::heap_allocator::HEAP_SPACE+33542544>, new_size=13, disk_inode=0x82260130 <os::mm::heap_allocator::HEAP_SPACE+33534256>, fs=0xfffffffffffdc540) at src/vfs.rs:95
+#1  0x000000008023b87e in easy_fs::vfs::{impl#0}::write_at::{closure#0} (disk_inode=0x82260130 <os::mm::heap_allocator::HEAP_SPACE+33534256>) at src/vfs.rs:284
+#2  0x000000008023fee0 in easy_fs::block_cache::BlockCache::modify<easy_fs::layout::DiskInode, usize, easy_fs::vfs::{impl#0}::write_at::{closure_env#0}> (self=0x82260020 <os::mm::heap_allocator::HEAP_SPACE+33533984>, offset=256, f=<error reading variable: Cannot access memory at address 0xd>) at src/block_cache.rs:61
+$4 = 13
+
+===== [B] Inode::clear #1 (CREATE re-opens an existing name) =====
+#0  easy_fs::vfs::Inode::clear (self=0x822640d0 <os::mm::heap_allocator::HEAP_SPACE+33550544>) at src/vfs.rs:292
+#1  0x000000008021b00e in os::fs::inode::open_file (name=..., flags=...) at src/fs/inode.rs:110
+#2  0x000000008020287a in os::syscall::fs::sys_open (path=0x42cd <error: Cannot access memory at address 0x42cd>, flags=513) at src/syscall/fs.rs:58
+#3  0x000000008021c966 in os::syscall::syscall (syscall_id=56, args=...) at src/syscall/mod.rs:63
+
+===== [B] Inode::write_at #2 =====
+#0  easy_fs::vfs::Inode::write_at (self=0x822640d0 <os::mm::heap_allocator::HEAP_SPACE+33550544>, offset=0, buf=...) at src/vfs.rs:282
+#1  0x000000008021b502 in os::fs::inode::{impl#2}::write (self=0x822621d0 <os::mm::heap_allocator::HEAP_SPACE+33542608>, buf=...) at src/fs/inode.rs:176
+#2  0x0000000080202314 in os::syscall::fs::sys_write (fd=3, buf=0x42c0 <error: Cannot access memory at address 0x42c0>, len=13) at src/syscall/fs.rs:25
+#3  0x000000008021c9d4 in os::syscall::syscall (syscall_id=64, args=...) at src/syscall/mod.rs:68
+$5 = 0
+
+===== [B] Inode::increase_size #3 =====
+#0  easy_fs::vfs::Inode::increase_size (self=0x822640d0 <os::mm::heap_allocator::HEAP_SPACE+33550544>, new_size=13, disk_inode=0x80265930 <os::mm::heap_allocator::HEAP_SPACE+2352>, fs=0xfffffffffffdc540) at src/vfs.rs:95
+#1  0x000000008023b87e in easy_fs::vfs::{impl#0}::write_at::{closure#0} (disk_inode=0x80265930 <os::mm::heap_allocator::HEAP_SPACE+2352>) at src/vfs.rs:284
+#2  0x000000008023fee0 in easy_fs::block_cache::BlockCache::modify<easy_fs::layout::DiskInode, usize, easy_fs::vfs::{impl#0}::write_at::{closure_env#0}> (self=0x80265820 <os::mm::heap_allocator::HEAP_SPACE+2080>, offset=256, f=<error reading variable: Cannot access memory at address 0xd>) at src/block_cache.rs:61
+$6 = 13
+
+===== [B] Inode::create #2 =====
+#0  easy_fs::vfs::Inode::create (self=0x82264c10 <os::mm::heap_allocator::HEAP_SPACE+33553424>, name=...) at src/vfs.rs:136
+#1  0x000000008021b06a in os::fs::inode::open_file (name=..., flags=...) at src/fs/inode.rs:114
+#2  0x000000008020287a in os::syscall::fs::sys_open (path=0x430d <error: Cannot access memory at address 0x430d>, flags=513) at src/syscall/fs.rs:58
+#3  0x000000008021c966 in os::syscall::syscall (syscall_id=56, args=...) at src/syscall/mod.rs:63
+$7 = "fname2"
+
+===== [B] Inode::increase_size #4 =====
+#0  easy_fs::vfs::Inode::increase_size (self=0x82264c10 <os::mm::heap_allocator::HEAP_SPACE+33553424>, new_size=1760, disk_inode=0x80266c30 <os::mm::heap_allocator::HEAP_SPACE+7216>, fs=0xfffffffffffdc4d0) at src/vfs.rs:95
+#1  0x0000000080235d1a in easy_fs::vfs::Inode::append_dirent (self=0x82264c10 <os::mm::heap_allocator::HEAP_SPACE+33553424>, name=..., inode_id=55, disk_inode=0x80266c30 <os::mm::heap_allocator::HEAP_SPACE+7216>, fs=0xfffffffffffdc4d0) at src/vfs.rs:126
+#2  0x000000008023b360 in easy_fs::vfs::{impl#0}::create::{closure#2} (root_inode=0x80266c30 <os::mm::heap_allocator::HEAP_SPACE+7216>) at src/vfs.rs:157
+$8 = 1760
+
+===== [B] Inode::link #1 =====
+#0  easy_fs::vfs::Inode::link (self=0x2, old_name=..., new_name=...) at src/vfs.rs:201
+#1  0x000000008021b110 in os::fs::inode::link_file (old_name=..., new_name=...) at src/fs/inode.rs:130
+#2  0x00000000802034d4 in os::syscall::fs::sys_linkat (old_name=0x430d <error: Cannot access memory at address 0x430d>, new_name=0x4314 <error: Cannot access memory at address 0x4314>) at src/syscall/fs.rs:137
+#3  0x000000008021c990 in os::syscall::syscall (syscall_id=37, args=...) at src/syscall/mod.rs:65
+$9 = <error reading variable: Cannot access memory at address 0x202000082309020>
+$10 = ""
+
+===== [B] Inode::increase_size #5 =====
+#0  easy_fs::vfs::Inode::increase_size (self=0x82264c10 <os::mm::heap_allocator::HEAP_SPACE+33553424>, new_size=1792, disk_inode=0x80266c30 <os::mm::heap_allocator::HEAP_SPACE+7216>, fs=0xfffffffffffdc548) at src/vfs.rs:95
+#1  0x0000000080235d1a in easy_fs::vfs::Inode::append_dirent (self=0x82264c10 <os::mm::heap_allocator::HEAP_SPACE+33553424>, name=..., inode_id=55, disk_inode=0x80266c30 <os::mm::heap_allocator::HEAP_SPACE+7216>, fs=0xfffffffffffdc548) at src/vfs.rs:126
+#2  0x000000008023b472 in easy_fs::vfs::{impl#0}::link::{closure#2} (disk_inode=0x80266c30 <os::mm::heap_allocator::HEAP_SPACE+7216>) at src/vfs.rs:203
+$11 = 1792
+
+===== [B] Inode::stat #1 =====
+#0  easy_fs::vfs::Inode::stat (self=0x822621d0 <os::mm::heap_allocator::HEAP_SPACE+33542608>) at src/vfs.rs:46
+#1  0x000000008021b1b0 in os::fs::inode::{impl#2}::stat (self=0x822640d0 <os::mm::heap_allocator::HEAP_SPACE+33550544>) at src/fs/inode.rs:140
+#2  0x0000000080202fa4 in os::syscall::fs::sys_fstat (fd=3, st=0xde18) at src/syscall/fs.rs:93
+#3  0x000000008021c9ea in os::syscall::syscall (syscall_id=80, args=...) at src/syscall/mod.rs:69
+
+===== [B] Inode::link #2 =====
+#0  easy_fs::vfs::Inode::link (self=0x2, old_name=..., new_name=...) at src/vfs.rs:201
+#1  0x000000008021b110 in os::fs::inode::link_file (old_name=..., new_name=...) at src/fs/inode.rs:130
+#2  0x00000000802034d4 in os::syscall::fs::sys_linkat (old_name=0x430d <error: Cannot access memory at address 0x430d>, new_name=0x431e <error: Cannot access memory at address 0x431e>) at src/syscall/fs.rs:137
+#3  0x000000008021c990 in os::syscall::syscall (syscall_id=37, args=...) at src/syscall/mod.rs:65
+$12 = <error reading variable: Cannot access memory at address 0x202000082309020>
+$13 = ""
+
+===== [B] Inode::increase_size #6 =====
+#0  easy_fs::vfs::Inode::increase_size (self=0x82264c10 <os::mm::heap_allocator::HEAP_SPACE+33553424>, new_size=1824, disk_inode=0x80266c30 <os::mm::heap_allocator::HEAP_SPACE+7216>, fs=0xfffffffffffdc548) at src/vfs.rs:95
+#1  0x0000000080235d1a in easy_fs::vfs::Inode::append_dirent (self=0x82264c10 <os::mm::heap_allocator::HEAP_SPACE+33553424>, name=..., inode_id=55, disk_inode=0x80266c30 <os::mm::heap_allocator::HEAP_SPACE+7216>, fs=0xfffffffffffdc548) at src/vfs.rs:126
+#2  0x000000008023b472 in easy_fs::vfs::{impl#0}::link::{closure#2} (disk_inode=0x80266c30 <os::mm::heap_allocator::HEAP_SPACE+7216>) at src/vfs.rs:203
+$14 = 1824
+
+===== [B] Inode::link #3 =====
+#0  easy_fs::vfs::Inode::link (self=0x2, old_name=..., new_name=...) at src/vfs.rs:201
+#1  0x000000008021b110 in os::fs::inode::link_file (old_name=..., new_name=...) at src/fs/inode.rs:130
+#2  0x00000000802034d4 in os::syscall::fs::sys_linkat (old_name=0x430d <error: Cannot access memory at address 0x430d>, new_name=0x4328 <error: Cannot access memory at address 0x4328>) at src/syscall/fs.rs:137
+#3  0x000000008021c990 in os::syscall::syscall (syscall_id=37, args=...) at src/syscall/mod.rs:65
+$15 = <error reading variable: Cannot access memory at address 0x202000082309020>
+$16 = ""
+
+===== [B] Inode::increase_size #7 =====
+#0  easy_fs::vfs::Inode::increase_size (self=0x82264c10 <os::mm::heap_allocator::HEAP_SPACE+33553424>, new_size=1856, disk_inode=0x80266c30 <os::mm::heap_allocator::HEAP_SPACE+7216>, fs=0xfffffffffffdc548) at src/vfs.rs:95
+#1  0x0000000080235d1a in easy_fs::vfs::Inode::append_dirent (self=0x82264c10 <os::mm::heap_allocator::HEAP_SPACE+33553424>, name=..., inode_id=55, disk_inode=0x80266c30 <os::mm::heap_allocator::HEAP_SPACE+7216>, fs=0xfffffffffffdc548) at src/vfs.rs:126
+#2  0x000000008023b472 in easy_fs::vfs::{impl#0}::link::{closure#2} (disk_inode=0x80266c30 <os::mm::heap_allocator::HEAP_SPACE+7216>) at src/vfs.rs:203
+$17 = 1856
+
+===== [B] Inode::stat #2 =====
+#0  easy_fs::vfs::Inode::stat (self=0x822621d0 <os::mm::heap_allocator::HEAP_SPACE+33542608>) at src/vfs.rs:46
+#1  0x000000008021b1b0 in os::fs::inode::{impl#2}::stat (self=0x822640d0 <os::mm::heap_allocator::HEAP_SPACE+33550544>) at src/fs/inode.rs:140
+#2  0x0000000080202fa4 in os::syscall::fs::sys_fstat (fd=3, st=0xde18) at src/syscall/fs.rs:93
+#3  0x000000008021c9ea in os::syscall::syscall (syscall_id=80, args=...) at src/syscall/mod.rs:69
+
+===== [B] Inode::write_at #3 =====
+#0  easy_fs::vfs::Inode::write_at (self=0x822621d0 <os::mm::heap_allocator::HEAP_SPACE+33542608>, offset=0, buf=...) at src/vfs.rs:282
+#1  0x000000008021b502 in os::fs::inode::{impl#2}::write (self=0x822640d0 <os::mm::heap_allocator::HEAP_SPACE+33550544>, buf=...) at src/fs/inode.rs:176
+#2  0x0000000080202314 in os::syscall::fs::sys_write (fd=3, buf=0x4300 <error: Cannot access memory at address 0x4300>, len=13) at src/syscall/fs.rs:25
+#3  0x000000008021c9d4 in os::syscall::syscall (syscall_id=64, args=...) at src/syscall/mod.rs:68
+$18 = 0
+
+===== [B] Inode::increase_size #8 =====
+#0  easy_fs::vfs::Inode::increase_size (self=0x822621d0 <os::mm::heap_allocator::HEAP_SPACE+33542608>, new_size=13, disk_inode=0x802671b0 <os::mm::heap_allocator::HEAP_SPACE+8624>, fs=0xfffffffffffdc540) at src/vfs.rs:95
+#1  0x000000008023b87e in easy_fs::vfs::{impl#0}::write_at::{closure#0} (disk_inode=0x802671b0 <os::mm::heap_allocator::HEAP_SPACE+8624>) at src/vfs.rs:284
+#2  0x000000008023fee0 in easy_fs::block_cache::BlockCache::modify<easy_fs::layout::DiskInode, usize, easy_fs::vfs::{impl#0}::write_at::{closure_env#0}> (self=0x80267020 <os::mm::heap_allocator::HEAP_SPACE+8224>, offset=384, f=<error reading variable: Cannot access memory at address 0xd>) at src/block_cache.rs:61
+$19 = 13
+
+===== [B] Inode::unlink #1 =====
+#0  easy_fs::vfs::Inode::unlink (self=0x313, name=...) at src/vfs.rs:233
+#1  0x000000008021b158 in os::fs::inode::unlink_file (name=...) at src/fs/inode.rs:135
+#2  0x0000000080203690 in os::syscall::fs::sys_unlinkat (name=0x430d <error: Cannot access memory at address 0x430d>) at src/syscall/fs.rs:144
+#3  0x000000008021c9a4 in os::syscall::syscall (syscall_id=35, args=...) at src/syscall/mod.rs:66
+$20 = "\002\000"
+
+===== [B] Inode::stat #3 =====
+#0  easy_fs::vfs::Inode::stat (self=0x822621d0 <os::mm::heap_allocator::HEAP_SPACE+33542608>) at src/vfs.rs:46
+#1  0x000000008021b1b0 in os::fs::inode::{impl#2}::stat (self=0x82263850 <os::mm::heap_allocator::HEAP_SPACE+33548368>) at src/fs/inode.rs:140
+#2  0x0000000080202fa4 in os::syscall::fs::sys_fstat (fd=3, st=0xde68) at src/syscall/fs.rs:93
+#3  0x000000008021c9ea in os::syscall::syscall (syscall_id=80, args=...) at src/syscall/mod.rs:69
+
+===== [B] Inode::unlink #2 =====
+#0  easy_fs::vfs::Inode::unlink (self=0x327, name=...) at src/vfs.rs:233
+#1  0x000000008021b158 in os::fs::inode::unlink_file (name=...) at src/fs/inode.rs:135
+#2  0x0000000080203690 in os::syscall::fs::sys_unlinkat (name=0x431e <error: Cannot access memory at address 0x431e>) at src/syscall/fs.rs:144
+#3  0x000000008021c9a4 in os::syscall::syscall (syscall_id=35, args=...) at src/syscall/mod.rs:66
+$21 = "\002\000"
+
+===== [B] Inode::unlink #3 =====
+#0  easy_fs::vfs::Inode::unlink (self=0x331, name=...) at src/vfs.rs:233
+#1  0x000000008021b158 in os::fs::inode::unlink_file (name=...) at src/fs/inode.rs:135
+#2  0x0000000080203690 in os::syscall::fs::sys_unlinkat (name=0x4328 <error: Cannot access memory at address 0x4328>) at src/syscall/fs.rs:144
+#3  0x000000008021c9a4 in os::syscall::syscall (syscall_id=35, args=...) at src/syscall/mod.rs:66
+$22 = "\002\000"
+
+===== [B] Inode::unlink #4 =====
+#0  easy_fs::vfs::Inode::unlink (self=0x31d, name=...) at src/vfs.rs:233
+#1  0x000000008021b158 in os::fs::inode::unlink_file (name=...) at src/fs/inode.rs:135
+#2  0x0000000080203690 in os::syscall::fs::sys_unlinkat (name=0x4314 <error: Cannot access memory at address 0x4314>) at src/syscall/fs.rs:144
+#3  0x000000008021c9a4 in os::syscall::syscall (syscall_id=35, args=...) at src/syscall/mod.rs:66
+$23 = "\002\000"
+
+----- ch6_file2 removed all four names, ending session -----
+[Inferior 1 (process 1) killed]
