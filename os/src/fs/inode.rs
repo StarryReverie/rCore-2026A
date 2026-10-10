@@ -52,7 +52,19 @@ impl OSInode {
     /// do not reset it to zero. At EOF return an empty vector. Program loading
     /// obtains the entire ELF by calling this on a newly opened file at offset 0.
     pub fn read_all(&self) -> Vec<u8> {
-        todo!("fs::OSInode::read_all")
+        let mut inner = self.inner.exclusive_access();
+        let mut buffer = [0u8; 512];
+        let mut data: Vec<u8> = Vec::new();
+        loop {
+            let len = inner.inode.read_at(inner.offset, &mut buffer);
+            if len == 0 {
+                break;
+            }
+            // Advance the open offset only by the bytes actually read.
+            inner.offset += len;
+            data.extend_from_slice(&buffer[..len]);
+        }
+        data
     }
 }
 
@@ -113,7 +125,25 @@ impl OpenFlags {
 /// with TRUNC. Every successful call has an independent offset. Do not allocate
 /// a file descriptor or replace the inode when truncating an existing file.
 pub fn open_file(name: &str, flags: OpenFlags) -> Option<Arc<OSInode>> {
-    todo!("fs::open_file")
+    let (readable, writable) = flags.read_write();
+    if flags.contains(OpenFlags::CREATE) {
+        // CREATE opens the existing file after truncating it, even without TRUNC.
+        if let Some(inode) = ROOT_INODE.find(name) {
+            inode.clear();
+            Some(Arc::new(OSInode::new(readable, writable, inode)))
+        } else {
+            ROOT_INODE
+                .create(name)
+                .map(|inode| Arc::new(OSInode::new(readable, writable, inode)))
+        }
+    } else {
+        ROOT_INODE.find(name).map(|inode| {
+            if flags.contains(OpenFlags::TRUNC) {
+                inode.clear();
+            }
+            Arc::new(OSInode::new(readable, writable, inode))
+        })
+    }
 }
 
 /// Add a hard link to an existing file in the root directory.
@@ -136,7 +166,18 @@ impl File for OSInode {
     /// been linked or unlinked since open. Preserve the offset and let the
     /// supplied syscall copy the result to the caller's address space.
     fn stat(&self) -> Option<Stat> {
-        todo!("fs::OSInode::stat")
+        let (ino, nlink, is_dir) = self.inner.exclusive_access().inode.stat();
+        Some(Stat {
+            dev: 0,
+            ino: ino as u64,
+            mode: if is_dir {
+                StatMode::DIR
+            } else {
+                StatMode::FILE
+            },
+            nlink,
+            pad: [0; 7],
+        })
     }
     fn readable(&self) -> bool {
         self.readable
@@ -152,8 +193,18 @@ impl File for OSInode {
     /// Constraints: Fill slices in order without requiring contiguous physical
     /// memory. Advance offset by actual bytes read, leaving the unused buffer
     /// suffix intact. An empty buffer returns 0 without advancing the offset.
-    fn read(&self, buf: UserBuffer) -> usize {
-        todo!("fs::OSInode::read")
+    fn read(&self, mut buf: UserBuffer) -> usize {
+        let mut inner = self.inner.exclusive_access();
+        let mut total_read = 0usize;
+        for slice in buf.buffers.iter_mut() {
+            let read_size = inner.inode.read_at(inner.offset, *slice);
+            if read_size == 0 {
+                break;
+            }
+            inner.offset += read_size;
+            total_read += read_size;
+        }
+        total_read
     }
     /// Todo: Write a translated user buffer at the current offset.
     ///
@@ -165,6 +216,15 @@ impl File for OSInode {
     /// bytes written. An empty buffer returns 0 without changing the offset.
     /// Do not translate addresses again or acquire the same inner borrow twice.
     fn write(&self, buf: UserBuffer) -> usize {
-        todo!("fs::OSInode::write")
+        let mut inner = self.inner.exclusive_access();
+        let mut total_written = 0usize;
+        for slice in buf.buffers.iter() {
+            let write_size = inner.inode.write_at(inner.offset, *slice);
+            // The filesystem guarantees a complete write for each slice.
+            assert_eq!(write_size, slice.len());
+            inner.offset += write_size;
+            total_written += write_size;
+        }
+        total_written
     }
 }
