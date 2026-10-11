@@ -1,0 +1,1 @@
+{"schema":"course-log-v1","id":"08bc6f70-7a72-4c8b-a36e-a1dcd4d6b343","timestamp":"2026-10-11T03:05:12.568Z","session":"","type":"ai_command_result","actor":"ai","source":"ai-adapter","command":"git show origin/ch7-api:rcore-ch7-api.md","cwd":".","exit_code":0,"duration_ms":20,"tool":"pi"}

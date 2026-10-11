@@ -1,0 +1,1 @@
+{"schema":"course-log-v1","id":"5967a03c-a538-4abb-b746-f4dd4902ec05","timestamp":"2026-10-11T03:04:43.276Z","session":"","type":"ai_command_result","actor":"ai","source":"ai-adapter","command":"git show main:docs/nixos-branch-adaptation.md","cwd":".","exit_code":0,"duration_ms":27,"tool":"pi"}
