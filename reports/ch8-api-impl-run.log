@@ -1,0 +1,552 @@
+warning: Git tree '/home/starryreverie/userdata/development/rCore-Tutorial-Code-2026A' is dirty
+evaluation warning: stdenv.isLinux is deprecated, use stdenv.hostPlatform.isLinux instead
+evaluation warning: stdenv.isDarwin is deprecated, use stdenv.hostPlatform.isDarwin instead
+rustup not found; assuming the Nix dev shell provides riscv64gc-unknown-none-elf and cargo-binutils.
+Platform: qemu
+   Compiling os v0.1.0 (/home/starryreverie/userdata/development/rCore-Tutorial-Code-2026A/os)
+    Finished `release` profile [optimized] target(s) in 2.33s
+make[1]: Entering directory '/home/starryreverie/userdata/development/rCore-Tutorial-Code-2026A/user'
+     Removed 926 files, 26.0MiB total
+target/riscv64gc-unknown-none-elf/release/ch2b_bad_address target/riscv64gc-unknown-none-elf/release/ch2b_bad_instructions target/riscv64gc-unknown-none-elf/release/ch2b_bad_register target/riscv64gc-unknown-none-elf/release/ch2b_hello_world target/riscv64gc-unknown-none-elf/release/ch2b_power_3 target/riscv64gc-unknown-none-elf/release/ch2b_power_5 target/riscv64gc-unknown-none-elf/release/ch2b_power_7 target/riscv64gc-unknown-none-elf/release/ch3b_yield0 target/riscv64gc-unknown-none-elf/release/ch3b_yield1 target/riscv64gc-unknown-none-elf/release/ch3b_yield2 target/riscv64gc-unknown-none-elf/release/ch3_sleep1 target/riscv64gc-unknown-none-elf/release/ch3_sleep target/riscv64gc-unknown-none-elf/release/ch3_trace target/riscv64gc-unknown-none-elf/release/ch4b_sbrk target/riscv64gc-unknown-none-elf/release/ch4_mmap0 target/riscv64gc-unknown-none-elf/release/ch4_mmap1 target/riscv64gc-unknown-none-elf/release/ch4_mmap2 target/riscv64gc-unknown-none-elf/release/ch4_mmap3 target/riscv64gc-unknown-none-elf/release/ch4_trace1 target/riscv64gc-unknown-none-elf/release/ch4_unmap2 target/riscv64gc-unknown-none-elf/release/ch4_unmap target/riscv64gc-unknown-none-elf/release/ch5b_exit target/riscv64gc-unknown-none-elf/release/ch5b_forktest2 target/riscv64gc-unknown-none-elf/release/ch5b_forktest target/riscv64gc-unknown-none-elf/release/ch5b_forktest_simple target/riscv64gc-unknown-none-elf/release/ch5b_forktree target/riscv64gc-unknown-none-elf/release/ch5b_initproc target/riscv64gc-unknown-none-elf/release/ch5b_user_shell target/riscv64gc-unknown-none-elf/release/ch5b_usertest target/riscv64gc-unknown-none-elf/release/ch5_exit0 target/riscv64gc-unknown-none-elf/release/ch5_exit1 target/riscv64gc-unknown-none-elf/release/ch5_getpid target/riscv64gc-unknown-none-elf/release/ch5_setprio target/riscv64gc-unknown-none-elf/release/ch5_spawn0 target/riscv64gc-unknown-none-elf/release/ch5_spawn1 target/riscv64gc-unknown-none-elf/release/ch5_stride0 target/riscv64gc-unknown-none-elf/release/ch5_stride1 target/riscv64gc-unknown-none-elf/release/ch5_stride2 target/riscv64gc-unknown-none-elf/release/ch5_stride3 target/riscv64gc-unknown-none-elf/release/ch5_stride4 target/riscv64gc-unknown-none-elf/release/ch5_stride5 target/riscv64gc-unknown-none-elf/release/ch5_stride target/riscv64gc-unknown-none-elf/release/ch5_usertest target/riscv64gc-unknown-none-elf/release/ch6b_cat target/riscv64gc-unknown-none-elf/release/ch6b_filetest_simple target/riscv64gc-unknown-none-elf/release/ch6b_initproc target/riscv64gc-unknown-none-elf/release/ch6b_user_shell target/riscv64gc-unknown-none-elf/release/ch6b_usertest target/riscv64gc-unknown-none-elf/release/ch6_file0 target/riscv64gc-unknown-none-elf/release/ch6_file1 target/riscv64gc-unknown-none-elf/release/ch6_file2 target/riscv64gc-unknown-none-elf/release/ch6_file3 target/riscv64gc-unknown-none-elf/release/ch6_usertest target/riscv64gc-unknown-none-elf/release/ch7b_cat target/riscv64gc-unknown-none-elf/release/ch7b_initproc target/riscv64gc-unknown-none-elf/release/ch7b_pipe_large_test target/riscv64gc-unknown-none-elf/release/ch7b_pipetest target/riscv64gc-unknown-none-elf/release/ch7b_run_pipe_test target/riscv64gc-unknown-none-elf/release/ch7b_sig_simple2 target/riscv64gc-unknown-none-elf/release/ch7b_sig_simple target/riscv64gc-unknown-none-elf/release/ch7b_sig_tests target/riscv64gc-unknown-none-elf/release/ch7b_user_shell target/riscv64gc-unknown-none-elf/release/ch7b_usertest target/riscv64gc-unknown-none-elf/release/ch7b_yield target/riscv64gc-unknown-none-elf/release/ch7_usertest target/riscv64gc-unknown-none-elf/release/ch8b_initproc target/riscv64gc-unknown-none-elf/release/ch8b_mpsc_sem target/riscv64gc-unknown-none-elf/release/ch8b_phil_din_mutex target/riscv64gc-unknown-none-elf/release/ch8b_race_adder_atomic target/riscv64gc-unknown-none-elf/release/ch8b_race_adder_loop target/riscv64gc-unknown-none-elf/release/ch8b_race_adder_mutex_spin target/riscv64gc-unknown-none-elf/release/ch8b_race_adder target/riscv64gc-unknown-none-elf/release/ch8b_stackful_coroutine target/riscv64gc-unknown-none-elf/release/ch8b_stackless_coroutine target/riscv64gc-unknown-none-elf/release/ch8b_sync_sem target/riscv64gc-unknown-none-elf/release/ch8b_test_condvar target/riscv64gc-unknown-none-elf/release/ch8b_threads_arg target/riscv64gc-unknown-none-elf/release/ch8b_threads target/riscv64gc-unknown-none-elf/release/ch8b_user_shell target/riscv64gc-unknown-none-elf/release/ch8b_usertest target/riscv64gc-unknown-none-elf/release/ch8_deadlock_mutex1 target/riscv64gc-unknown-none-elf/release/ch8_deadlock_sem1 target/riscv64gc-unknown-none-elf/release/ch8_deadlock_sem2 target/riscv64gc-unknown-none-elf/release/ch8_usertest
+   Compiling scopeguard v1.2.0
+   Compiling lock_api v0.4.6
+   Compiling spin v0.9.9
+   Compiling spin v0.7.2
+   Compiling buddy_system_allocator v0.6.0
+   Compiling lazy_static v1.5.1
+   Compiling bitflags v1.3.2
+   Compiling user_lib v0.1.0 (/home/starryreverie/userdata/development/rCore-Tutorial-Code-2026A/user)
+warning: unused import: `get_time`
+  --> src/bin/ch7b_pipe_large_test.rs:10:29
+   |
+10 | use user_lib::{close, fork, get_time, pipe, read, wait, write,getpid};
+   |                             ^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: `user_lib` (bin "ch7b_pipe_large_test") generated 1 warning (run `cargo fix --bin "ch7b_pipe_large_test"` to apply 1 suggestion)
+warning: creating a mutable reference to mutable static is discouraged
+  --> src/bin/ch8b_race_adder_loop.rs:24:17
+   |
+24 |         let a = &mut A as *mut usize;
+   |                 ^^^^^^ mutable reference to mutable static
+   |
+   = note: for more information, see issue #114447 <https://github.com/rust-lang/rust/issues/114447>
+   = note: this will be a hard error in the 2024 edition
+   = note: this mutable reference has lifetime `'static`, but if the static gets accessed (read or written) by any other means, or any other reference is created, then any further use of this mutable reference is Undefined Behavior
+   = note: `#[warn(static_mut_refs)]` on by default
+help: use `addr_of_mut!` instead to create a raw pointer
+   |
+24 |         let a = addr_of_mut!(A) as *mut usize;
+   |                 ~~~~~~~~~~~~~~~
+
+warning: `user_lib` (bin "ch8b_race_adder_loop") generated 1 warning
+warning: creating a mutable reference to mutable static is discouraged
+  --> src/bin/ch8b_race_adder_mutex_spin.rs:20:17
+   |
+20 |         let a = &mut A as *mut usize;
+   |                 ^^^^^^ mutable reference to mutable static
+   |
+   = note: for more information, see issue #114447 <https://github.com/rust-lang/rust/issues/114447>
+   = note: this will be a hard error in the 2024 edition
+   = note: this mutable reference has lifetime `'static`, but if the static gets accessed (read or written) by any other means, or any other reference is created, then any further use of this mutable reference is Undefined Behavior
+   = note: `#[warn(static_mut_refs)]` on by default
+help: use `addr_of_mut!` instead to create a raw pointer
+   |
+20 |         let a = addr_of_mut!(A) as *mut usize;
+   |                 ~~~~~~~~~~~~~~~
+
+warning: `user_lib` (bin "ch8b_race_adder_mutex_spin") generated 1 warning
+warning: Rust ABI is unsupported in naked functions
+   --> src/bin/ch8b_stackful_coroutine.rs:259:1
+    |
+259 | unsafe fn switch(old: *mut TaskContext, new: *const TaskContext) {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(undefined_naked_function_abi)]` on by default
+
+warning: field `id` is never read
+  --> src/bin/ch8b_stackful_coroutine.rs:36:5
+   |
+35 | struct Task {
+   |        ---- field in this struct
+36 |     id: usize,
+   |     ^^
+   |
+   = note: `#[warn(dead_code)]` on by default
+
+warning: `user_lib` (bin "ch8b_stackful_coroutine") generated 2 warnings
+warning: creating a mutable reference to mutable static is discouraged
+  --> src/bin/ch8b_race_adder_atomic.rs:26:17
+   |
+26 |         let a = &mut A as *mut usize;
+   |                 ^^^^^^ mutable reference to mutable static
+   |
+   = note: for more information, see issue #114447 <https://github.com/rust-lang/rust/issues/114447>
+   = note: this will be a hard error in the 2024 edition
+   = note: this mutable reference has lifetime `'static`, but if the static gets accessed (read or written) by any other means, or any other reference is created, then any further use of this mutable reference is Undefined Behavior
+   = note: `#[warn(static_mut_refs)]` on by default
+help: use `addr_of_mut!` instead to create a raw pointer
+   |
+26 |         let a = addr_of_mut!(A) as *mut usize;
+   |                 ~~~~~~~~~~~~~~~
+
+warning: `user_lib` (bin "ch8b_race_adder_atomic") generated 1 warning
+warning: creating a mutable reference to mutable static is discouraged
+  --> src/bin/ch8b_race_adder.rs:18:17
+   |
+18 |         let a = &mut A as *mut usize;
+   |                 ^^^^^^ mutable reference to mutable static
+   |
+   = note: for more information, see issue #114447 <https://github.com/rust-lang/rust/issues/114447>
+   = note: this will be a hard error in the 2024 edition
+   = note: this mutable reference has lifetime `'static`, but if the static gets accessed (read or written) by any other means, or any other reference is created, then any further use of this mutable reference is Undefined Behavior
+   = note: `#[warn(static_mut_refs)]` on by default
+help: use `addr_of_mut!` instead to create a raw pointer
+   |
+18 |         let a = addr_of_mut!(A) as *mut usize;
+   |                 ~~~~~~~~~~~~~~~
+
+warning: `user_lib` (bin "ch8b_race_adder") generated 1 warning
+    Finished `release` profile [optimized] target(s) in 16.76s
+make[1]: Leaving directory '/home/starryreverie/userdata/development/rCore-Tutorial-Code-2026A/user'
+    Finished `release` profile [optimized] target(s) in 0.01s
+     Running `target/release/easy-fs-fuse -s ../user/src/bin/ -t ../user/target/riscv64gc-unknown-none-elf/release/`
+src_path = ../user/src/bin/
+target_path = ../user/target/riscv64gc-unknown-none-elf/release/
+[rustsbi] RustSBI version 0.3.0-alpha.2, adapting to RISC-V SBI v1.0.0
+.______       __    __      _______.___________.  _______..______   __
+|   _  \     |  |  |  |    /       |           | /       ||   _  \ |  |
+|  |_)  |    |  |  |  |   |   (----`---|  |----`|   (----`|  |_)  ||  |
+|      /     |  |  |  |    \   \       |  |      \   \    |   _  < |  |
+|  |\  \----.|  `--'  |.----)   |      |  |  .----)   |   |  |_)  ||  |
+| _| `._____| \______/ |_______/       |__|  |_______/    |______/ |__|
+[rustsbi] Implementation     : RustSBI-QEMU Version 0.2.0-alpha.2
+[rustsbi] Platform Name      : riscv-virtio,qemu
+[rustsbi] Platform SMP       : 1
+[rustsbi] Platform Memory    : 0x80000000..0x88000000
+[rustsbi] Boot HART          : 0
+[rustsbi] Device Tree Region : 0x87000000..0x87000ef2
+[rustsbi] Firmware Address   : 0x80000000
+[rustsbi] Supervisor Address : 0x80200000
+[rustsbi] pmp01: 0x00000000..0x80000000 (-wr)
+[rustsbi] pmp02: 0x80000000..0x80200000 (---)
+[rustsbi] pmp03: 0x80200000..0x88000000 (xwr)
+[rustsbi] pmp04: 0x88000000..0x00000000 (-wr)
+[kernel] Hello, world!
+remap_test passed!
+/**** APPS ****
+ch2b_bad_address
+ch2b_bad_instructions
+ch2b_bad_register
+ch2b_hello_world
+ch2b_power_3
+ch2b_power_5
+ch2b_power_7
+ch3_sleep
+ch3_sleep1
+ch3_trace
+ch3b_yield0
+ch3b_yield1
+ch3b_yield2
+ch4_mmap0
+ch4_mmap1
+ch4_mmap2
+ch4_mmap3
+ch4_trace1
+ch4_unmap
+ch4_unmap2
+ch4b_sbrk
+ch5_exit0
+ch5_exit1
+ch5_getpid
+ch5_setprio
+ch5_spawn0
+ch5_spawn1
+ch5_stride
+ch5_stride0
+ch5_stride1
+ch5_stride2
+ch5_stride3
+ch5_stride4
+ch5_stride5
+ch5_usertest
+ch5b_exit
+ch5b_forktest
+ch5b_forktest2
+ch5b_forktest_simple
+ch5b_forktree
+ch5b_initproc
+ch5b_user_shell
+ch5b_usertest
+ch6_file0
+ch6_file1
+ch6_file2
+ch6_file3
+ch6_usertest
+ch6b_cat
+ch6b_filetest_simple
+ch6b_initproc
+ch6b_user_shell
+ch6b_usertest
+ch7_usertest
+ch7b_cat
+ch7b_initproc
+ch7b_pipe_large_test
+ch7b_pipetest
+ch7b_run_pipe_test
+ch7b_sig_simple
+ch7b_sig_simple2
+ch7b_sig_tests
+ch7b_user_shell
+ch7b_usertest
+ch7b_yield
+ch8_deadlock_mutex1
+ch8_deadlock_sem1
+ch8_deadlock_sem2
+ch8_usertest
+ch8b_initproc
+ch8b_mpsc_sem
+ch8b_phil_din_mutex
+ch8b_race_adder
+ch8b_race_adder_atomic
+ch8b_race_adder_loop
+ch8b_race_adder_mutex_spin
+ch8b_stackful_coroutine
+ch8b_stackless_coroutine
+ch8b_sync_sem
+ch8b_test_condvar
+ch8b_threads
+ch8b_threads_arg
+ch8b_user_shell
+ch8b_usertest
+ch9b_initproc
+ch9b_usertest
+**************/
+Rust user shell
+>> ch8_usertest
+Usertests: Running ch2b_hello_world 
+Usertests: Running ch2b_power_3 
+Usertests: Running ch2b_power_5 
+Usertests: Running ch2b_power_7 
+Usertests: Running ch3b_yield0 
+Usertests: Running ch3b_yield1 
+Usertests: Running ch3b_yield2 
+Usertests: Running ch5b_exit 
+Usertests: Running ch5b_forktest_simple 
+Usertests: Running ch5b_forktest 
+Usertests: Running ch5b_forktest2 
+Usertests: Running ch6b_filetest_simple 
+Usertests: Running ch7b_pipetest 
+Usertests: Running ch8_deadlock_mutex1 
+Usertests: Running ch8_deadlock_sem1 
+Usertests: Running ch8_deadlock_sem2 
+Usertests: Running ch8b_mpsc_sem 
+Usertests: Running ch8b_phil_din_mutex 
+Usertests: Running ch8b_race_adder_mutex_spin 
+Usertests: Running ch8b_sync_sem 
+Usertests: Running ch8b_test_condvar 
+Usertests: Running ch8b_threads 
+Usertests: Running ch8b_threads_arg 
+power_3 [10000/200000]
+power_3 [20000/200000]
+power_3 [30000/200000]
+power_3 [40000/200000]
+power_3 [50000/200000]
+power_3 [60000/200000]
+power_3 [70000/200000]
+power_3 [80000/200000]
+power_3 [90000/200000]
+power_3 [100000/200000]
+power_3 [110000/200000]
+power_3 [120000/200000]
+power_3 [130000/200000]
+power_3 [140000/200000]
+power_3 [150000/200000]
+power_3 [160000/200000]
+power_3 [170000/200000]
+power_3 [180000/200000]
+power_3 [190000/200000]
+power_3 [200000/200000]
+3^200000 = 871008973(MOD 998244353)
+Test power_3 OK!
+power_5 [10000/140000]
+power_5 [20000/140000]
+power_5 [30000/140000]
+power_5 [40000/140000]
+power_5 [50000/140000]
+power_5 [60000/140000]
+power_5 [70000/140000]
+power_5 [80000/140000]
+power_5 [90000/140000]
+power_5 [100000/140000]
+power_5 [110000/140000]
+power_5 [120000/140000]
+power_5 [130000/140000]
+power_5 [140000/140000]
+5^140000 = 386471875(MOD 998244353)
+Test power_5 OK!
+AAAAAAAAAA [1/5]
+BBBBBBBBBB [1/5]
+CCCCCCCCCC [1/5]
+I am the parent. Forking the child...
+I am parent, fork a child pid 26
+I am the parent, waiting now..
+sys_wait without child process test passed!
+parent start, pid = 11!
+ready waiting on parent process!
+forked child pid = 28
+forked child pid = 29
+forked child pid = 30
+forked child pid = 31
+forked child pid = 32
+forked child pid = 33
+forked child pid = 34
+forked child pid = 35
+forked child pid = 36
+forked child pid = 37
+forked child pid = 38
+forked child pid = 39
+forked child pid = 40
+forked child pid = 41
+forked child pid = 42
+deadlock test mutex 1 OK!
+Here comes 5 philosophers!
+Hello, world from user mode program!
+power_7 [10000/160000]
+power_7 [20000/160000]
+power_7 [30000/160000]
+power_7 [40000/160000]
+power_7 [50000/160000]
+power_7 [60000/160000]
+power_7 [70000/160000]
+power_7 [80000/160000]
+power_7 [90000/160000]
+power_7 [100000/160000]
+power_7 [110000/160000]
+power_7 [120000/160000]
+power_7 [130000/160000]
+power_7 [140000/160000]
+power_7 [150000/160000]
+power_7 [160000/160000]
+7^160000 = 667897727(MOD 998244353)
+Test power_7 OK!
+AAAAAAAAAA [2/5]
+BBBBBBBBBB [2/5]
+CCCCCCCCCC [2/5]
+I am the child.
+hello child process!
+child process pid = 27, exit code = 100
+I am child 1
+I am child 2
+I am child 3
+I am child 4
+I am child 5
+I am child 6
+I am child 7
+I am child 8
+I am child 9
+I am child 10
+I am child 11
+I am child 12
+I am child 13
+I am child 14
+forked child pid = 27
+forked child pid = 74
+forked child pid = 75
+forked child pid = 76
+forked child pid = 77
+forked child pid = 78
+forked child pid = 79
+pid 43 sleep for 1025 ms
+pid 44 sleep for 1216 ms
+pid 45 sleep for 1409 ms
+pid 46 sleep for 1409 ms
+pid 47 sleep for 1604 ms
+pid 48 sleep for 1801 ms
+pid 49 sleep for 1801 ms
+pid 50 sleep for 1000 ms
+pid 51 sleep for 1201 ms
+pid 52 sleep for 1201 ms
+pid 53 sleep for 1404 ms
+pid 54 sleep for 1404 ms
+pid 55 sleep for 1609 ms
+pid 56 sleep for 1816 ms
+pid 57 sleep for 1816 ms
+pid 58 sleep for 1025 ms
+pid 59 sleep for 1236 ms
+pid 60 sleep for 1236 ms
+pid 61 sleep for 1449 ms
+pid 62 sleep for 1449 ms
+pid 63 sleep for 1664 ms
+pid 64 sleep for 1881 ms
+pid 65 sleep for 1881 ms
+pid 66 sleep for 1100 ms
+pid 67 sleep for 1321 ms
+pid 68 sleep for 1321 ms
+pid 69 sleep for 1544 ms
+pid 70 sleep for 1544 ms
+pid 71 sleep for 1769 ms
+pid 72 sleep for 1996 ms
+Read OK, child process exited!
+pipetest passed!
+thread 1 running
+thread 2 running
+thread 3 running
+Second want to continue,but need to wait first
+Second want to continue,but need to wait A=1
+Second: A is 0
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccthread#1 exited with code 1
+thread#2 exited with code 2
+thread#3 exited with code 3
+main thread exited.
+threads with arg test passed!
+[32mUsertests: Test ch2b_hello_world  in Process 3 exited with code 0[0m
+[32mUsertests: Test ch2b_power_3  in Process 4 exited with code 0[0m
+[32mUsertests: Test ch2b_power_5  in Process 5 exited with code 0[0m
+[32mUsertests: Test ch2b_power_7  in Process 6 exited with code 0[0m
+AAAAAAAAAA [3/5]
+BBBBBBBBBB [3/5]
+CCCCCCCCCC [3/5]
+I am child 0
+I am child 15
+I am child 16
+I am child 17
+I am child 18
+I am child 19
+I am child 20
+I am child 21
+I am child 22
+forked child pid = 80
+forked child pid = 6
+forked child pid = 5
+forked child pid = 4
+forked child pid = 3
+forked child pid = 73
+forked child pid = 81
+forked child pid = 82
+forked child pid = 83
+forked child pid = 84
+forked child pid = 85
+forked child pid = 86
+forked child pid = 87
+forked child pid = 88
+forked child pid = 89
+forked child pid = 90
+forked child pid = 91
+forked child pid = 92
+First work and wakeup Second
+First work, Change A --> 1 and wakeup Second
+AAAAAAAAAA [4/5]
+BBBBBBBBBB [4/5]
+CCCCCCCCCC [4/5]
+I am child 23
+I am child 24
+I am child 25
+I am child 26
+I am child 27
+I am child 28
+I am child 29
+I am child 30
+I am child 31
+I am child 32
+I am child 33
+I am child 34
+I am child 35
+I am child 36
+I am child 37
+I am child 38
+I am child 39
+forktest pass.
+file_test passed!
+Second can work now
+A is 1, Second can work now
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbcccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccAAAAAAAAAA [5/5]
+BBBBBBBBBB [5/5]
+CCCCCCCCCC [5/5]
+sync_sem passed!
+test_condvar passed!
+cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc3754
+Test write A OK!
+Test write B OK!
+Test write C OK!
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa3754
+bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbthread#1 exited with code 1
+[32mUsertests: Test ch3b_yield0  in Process 7 exited with code 0[0m
+[32mUsertests: Test ch3b_yield1  in Process 8 exited with code 0[0m
+[32mUsertests: Test ch3b_yield2  in Process 9 exited with code 0[0m
+bbbbbbbbbbbbbbbbbbbb3754
+thread#2 exited with code 2
+thread#3 exited with code 3
+main thread exited.
+threads test passed!
+waitpid 26 ok.
+exit pass.
+[32mUsertests: Test ch5b_exit  in Process 10 exited with code 0[0m
+[32mUsertests: Test ch5b_forktest_simple  in Process 11 exited with code 0[0m
+[32mUsertests: Test ch5b_forktest  in Process 12 exited with code 0[0m
+Deadlock detected. Test 08_sem1 failed!
+thread 2 exited
+thread 1 exited
+deadlock test semaphore 1 OK!
+time cost is 594ms
+race adder using spin mutex test passed!
+0 0 0 0 0 0 0 0 0 0 0 0 0 1 2 3 0 0 0 0 0 1 2 3 0 0 0 0 0 1 2 3 0 0 0 0 0 1 2 3 0 0 0 0 0 1 2 3 0 0 0 0 0 1 2 3 0 0 0 0 0 1 2 3 0 0 0 0 0 1 2 3 0 0 0 0 0 1 2 3 0 0 0 0 0 1 2 3 0 0 0 0 0 1 2 3 0 0 0 0 0 1 2 3 0 0 0 0 0 1 2 3 0 0 0 0 0 1 2 3 0 0 0 0 0 1 2 3 0 0 0 0 0 1 2 3 0 0 0 0 0 1 2 3 0 0 0 0 0 1 2 3 0 0 1 1 1 1 2 3 1 1 1 1 1 1 2 3 1 1 1 1 1 1 2 3 1 1 1 1 1 1 2 3 1 1 1 1 1 1 2 3 1 1 1 1 1 1 2 3 1 1 1 1 1 1 2 3 1 1 1 1 1 1 2 3 1 1 1 1 1 1 2 3 1 1 1 1 1 1 2 3 1 1 1 1 1 1 2 3 1 1 1 1 1 1 2 3 1 1 1 1 1 1 2 3 1 1 1 1 1 1 2 3 2 2 2 2 2 2 2 3 2 2 2 2 2 3 2 2 2 2 2 2 2 3 2 2 2 2 2 2 2 3 2 2 2 2 2 2 2 3 2 2 2 2 2 2 2 3 2 2 2 2 2 2 2 3 2 2 2 2 2 2 2 3 2 2 2 2 2 2 2 3 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
+mpsc_sem passed!
+deadlock test semaphore 2 OK!
+pid 50 OK!
+pid 43 OK!
+time cost = 1009
+'-' -> THINKING; 'x' -> EATING; ' ' -> WAITING 
+#0:      ------------                           xxxxxxxxxx----------             xxxxx-----xxxxxxx--xxx
+#1:      -------xxxxxxxxx----        xxxxxxxxxx-----------       xx----xxxxxxx                         
+#2:      ----------            xxx----------    xxx-------xxxxxxx-------------xxxxx                    
+#3:      ----------xxxxxxxxxx--------xxxxxx--------xxxxxxx---    xxxxxxxxxx                            
+#4:      ----------            xxx---------               xxxxxxx---       xxxxxx-------xx             
+#0:      ------------                           xxxxxxxxxx----------             xxxxx-----xxxxxxx--xxx
+philosopher dining problem with mutex test passed!
+pid 58 OK!
+pid 66 OK!
+pid 51 OK!
+pid 52 OK!
+pid 44 OK!
+pid 59 OK!
+pid 60 OK!
+pid 67 OK!
+pid 68 OK!
+pid 45 OK!
+pid 53 OK!
+pid 46 OK!
+pid 54 OK!
+pid 61 OK!
+pid 62 OK!
+pid 69 OK!
+pid 70 OK!
+pid 47 OK!
+pid 55 OK!
+pid 63 OK!
+pid 71 OK!
+pid 48 OK!
+pid 49 OK!
+pid 56 OK!
+pid 57 OK!
+pid 64 OK!
+pid 65 OK!
+pid 72 OK!
+forktest2 test passed!
+[32mUsertests: Test ch5b_forktest2  in Process 13 exited with code 0[0m
+[32mUsertests: Test ch6b_filetest_simple  in Process 14 exited with code 0[0m
+[32mUsertests: Test ch7b_pipetest  in Process 15 exited with code 0[0m
+[32mUsertests: Test ch8_deadlock_mutex1  in Process 16 exited with code 0[0m
+[32mUsertests: Test ch8_deadlock_sem1  in Process 17 exited with code 0[0m
+[32mUsertests: Test ch8_deadlock_sem2  in Process 18 exited with code 0[0m
+[32mUsertests: Test ch8b_mpsc_sem  in Process 19 exited with code 0[0m
+[32mUsertests: Test ch8b_phil_din_mutex  in Process 20 exited with code 0[0m
+[32mUsertests: Test ch8b_race_adder_mutex_spin  in Process 21 exited with code 0[0m
+[32mUsertests: Test ch8b_sync_sem  in Process 22 exited with code 0[0m
+[32mUsertests: Test ch8b_test_condvar  in Process 23 exited with code 0[0m
+[32mUsertests: Test ch8b_threads  in Process 24 exited with code 0[0m
+[32mUsertests: Test ch8b_threads_arg  in Process 25 exited with code 0[0m
+ch8 Usertests passed!
+Shell: Process 2 exited with code 0
+>> qemu-system-riscv64: terminating on signal 15 from pid 154966 (timeout)

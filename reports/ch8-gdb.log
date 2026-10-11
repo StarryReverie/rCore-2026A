@@ -1,0 +1,257 @@
+# ch8 GDB trace (reference ch8, MODE=debug BASE=2, gdb 17.2, qemu 7.0.0)
+# Scenes A/B/D are complete; Scene C hit a GDB-attach kernel trap on the heavy spin app.
+
+0x0000000000001000 in ?? ()
+
+########## Scene A: ch8b_test_condvar (mutex + condvar) ##########
+Breakpoint 1 at 0x8023aef2: file src/syscall/sync.rs, line 64.
+Breakpoint 2 at 0x80225d2c: file src/sync/mutex.rs, line 100.
+Breakpoint 3 at 0x8022bbb8: file src/sync/condvar.rs, line 40.
+Breakpoint 4 at 0x8022bb12: file src/sync/condvar.rs, line 32.
+Breakpoint 5 at 0x80225f38: file src/sync/mutex.rs, line 115.
+Warning: the current language does not match this frame.
+
+===== [A1] sys_mutex_lock #1 mutex_id=0 =====
+#0  os::syscall::sync::sys_mutex_lock (mutex_id=0) at src/syscall/sync.rs:64
+#1  0x000000008022b676 in os::syscall::syscall (syscall_id=464, args=...) at src/syscall/mod.rs:142
+#2  0x0000000080241e80 in os::trap::trap_handler () at src/trap/mod.rs:73
+#3  0x0000000000000498 in ?? ()
+
+===== [A2] MutexBlocking::lock #1 =====
+#0  os::sync::mutex::{impl#3}::lock (self=0x80285990 <os::mm::heap_allocator::HEAP_SPACE+14736>) at src/sync/mutex.rs:100
+#1  0x000000008023b24e in os::syscall::sync::sys_mutex_lock (mutex_id=0) at src/syscall/sync.rs:83
+#2  0x000000008022b676 in os::syscall::syscall (syscall_id=464, args=...) at src/syscall/mod.rs:142
+#3  0x0000000080241e80 in os::trap::trap_handler () at src/trap/mod.rs:73
+locked=0 wait_queue_len=0
+
+===== [A1] sys_mutex_lock #2 mutex_id=0 =====
+#0  os::syscall::sync::sys_mutex_lock (mutex_id=0) at src/syscall/sync.rs:64
+#1  0x000000008022b676 in os::syscall::syscall (syscall_id=464, args=...) at src/syscall/mod.rs:142
+#2  0x0000000080241e80 in os::trap::trap_handler () at src/trap/mod.rs:73
+#3  0x000000000000042c in ?? ()
+
+===== [A2] MutexBlocking::lock #2 =====
+#0  os::sync::mutex::{impl#3}::lock (self=0x80285990 <os::mm::heap_allocator::HEAP_SPACE+14736>) at src/sync/mutex.rs:100
+#1  0x000000008023b24e in os::syscall::sync::sys_mutex_lock (mutex_id=0) at src/syscall/sync.rs:83
+#2  0x000000008022b676 in os::syscall::syscall (syscall_id=464, args=...) at src/syscall/mod.rs:142
+#3  0x0000000080241e80 in os::trap::trap_handler () at src/trap/mod.rs:73
+locked=1 wait_queue_len=0
+
+===== [A3] Condvar::wait #1 =====
+#0  os::sync::condvar::Condvar::wait (self=0x80286590 <os::mm::heap_allocator::HEAP_SPACE+17808>, mutex=...) at src/sync/condvar.rs:40
+#1  0x000000008023c9da in os::syscall::sync::sys_condvar_wait (condvar_id=0, mutex_id=0) at src/syscall/sync.rs:253
+#2  0x000000008022b712 in os::syscall::syscall (syscall_id=473, args=...) at src/syscall/mod.rs:150
+#3  0x0000000080241e80 in os::trap::trap_handler () at src/trap/mod.rs:73
+condvar_wait_queue_len=0
+
+===== [A5] MutexBlocking::unlock #1 =====
+#0  os::sync::mutex::{impl#3}::unlock (self=0x80285990 <os::mm::heap_allocator::HEAP_SPACE+14736>) at src/sync/mutex.rs:115
+#1  0x000000008022bbe4 in os::sync::condvar::Condvar::wait (self=0x80286590 <os::mm::heap_allocator::HEAP_SPACE+17808>, mutex=...) at src/sync/condvar.rs:41
+#2  0x000000008023c9da in os::syscall::sync::sys_condvar_wait (condvar_id=0, mutex_id=0) at src/syscall/sync.rs:253
+#3  0x000000008022b712 in os::syscall::syscall (syscall_id=473, args=...) at src/syscall/mod.rs:150
+locked=1 wait_queue_len=1
+
+===== [A4] Condvar::signal #1 =====
+#0  os::sync::condvar::Condvar::signal (self=0x80286590 <os::mm::heap_allocator::HEAP_SPACE+17808>) at src/sync/condvar.rs:32
+#1  0x000000008023c60c in os::syscall::sync::sys_condvar_signal (condvar_id=0) at src/syscall/sync.rs:232
+#2  0x000000008022b6fc in os::syscall::syscall (syscall_id=472, args=...) at src/syscall/mod.rs:149
+#3  0x0000000080241e80 in os::trap::trap_handler () at src/trap/mod.rs:73
+condvar_wait_queue_len=1
+
+===== [A5] MutexBlocking::unlock #2 =====
+#0  os::sync::mutex::{impl#3}::unlock (self=0x80285990 <os::mm::heap_allocator::HEAP_SPACE+14736>) at src/sync/mutex.rs:115
+#1  0x000000008023b354 in os::syscall::sync::sys_mutex_unlock (mutex_id=0) at src/syscall/sync.rs:104
+#2  0x000000008022b68a in os::syscall::syscall (syscall_id=466, args=...) at src/syscall/mod.rs:143
+#3  0x0000000080241e80 in os::trap::trap_handler () at src/trap/mod.rs:73
+locked=1 wait_queue_len=0
+
+===== [A2] MutexBlocking::lock #3 =====
+#0  os::sync::mutex::{impl#3}::lock (self=0x80285990 <os::mm::heap_allocator::HEAP_SPACE+14736>) at src/sync/mutex.rs:100
+#1  0x000000008022bc6c in os::sync::condvar::Condvar::wait (self=0x80286590 <os::mm::heap_allocator::HEAP_SPACE+17808>, mutex=...) at src/sync/condvar.rs:46
+#2  0x000000008023c9da in os::syscall::sync::sys_condvar_wait (condvar_id=0, mutex_id=0) at src/syscall/sync.rs:253
+#3  0x000000008022b712 in os::syscall::syscall (syscall_id=473, args=...) at src/syscall/mod.rs:150
+locked=0 wait_queue_len=0
+
+===== [A5] MutexBlocking::unlock #3 =====
+#0  os::sync::mutex::{impl#3}::unlock (self=0x80285990 <os::mm::heap_allocator::HEAP_SPACE+14736>) at src/sync/mutex.rs:115
+#1  0x000000008023b354 in os::syscall::sync::sys_mutex_unlock (mutex_id=0) at src/syscall/sync.rs:104
+#2  0x000000008022b68a in os::syscall::syscall (syscall_id=466, args=...) at src/syscall/mod.rs:143
+#3  0x0000000080241e80 in os::trap::trap_handler () at src/trap/mod.rs:73
+locked=1 wait_queue_len=0
+Cannot execute this command while the target is running.
+Use the "interrupt" command to stop the target
+and then try again.
+
+0x0000000000001000 in ?? ()
+
+########## Scene B: ch8b_sync_sem (semaphore, count 0) ##########
+Breakpoint 1 at 0x802470c4: file src/sync/semaphore.rs, line 50.
+Breakpoint 2 at 0x802472cc: file src/sync/semaphore.rs, line 59.
+Breakpoint 3 at 0x80246ee8: file src/sync/semaphore.rs, line 36.
+Breakpoint 4 at 0x8024707c: file src/sync/semaphore.rs, line 43.
+Warning: the current language does not match this frame.
+
+===== [B1] Semaphore::down #1 entry =====
+#0  os::sync::semaphore::Semaphore::down (self=0x80286510 <os::mm::heap_allocator::HEAP_SPACE+17680>) at src/sync/semaphore.rs:50
+#1  0x000000008023be70 in os::syscall::sync::sys_semaphore_down (sem_id=0) at src/syscall/sync.rs:177
+#2  0x000000008022b6da in os::syscall::syscall (syscall_id=470, args=...) at src/syscall/mod.rs:147
+#3  0x0000000080241e80 in os::trap::trap_handler () at src/trap/mod.rs:73
+count=0 wait_queue_len=0
+
+===== [B2] Semaphore::down -> block #1 =====
+#0  os::sync::semaphore::Semaphore::down (self=0x80286510 <os::mm::heap_allocator::HEAP_SPACE+17680>) at src/sync/semaphore.rs:59
+#1  0x000000008023be70 in os::syscall::sync::sys_semaphore_down (sem_id=0) at src/syscall/sync.rs:177
+#2  0x000000008022b6da in os::syscall::syscall (syscall_id=470, args=...) at src/syscall/mod.rs:147
+count=-1 wait_queue_len=1
+
+===== [B3] Semaphore::up #1 entry =====
+#0  os::sync::semaphore::Semaphore::up (self=0x80286510 <os::mm::heap_allocator::HEAP_SPACE+17680>) at src/sync/semaphore.rs:36
+#1  0x000000008023bb26 in os::syscall::sync::sys_semaphore_up (sem_id=0) at src/syscall/sync.rs:157
+#2  0x000000008022b6b2 in os::syscall::syscall (syscall_id=468, args=...) at src/syscall/mod.rs:145
+#3  0x0000000080241e80 in os::trap::trap_handler () at src/trap/mod.rs:73
+count=-1 wait_queue_len=1
+
+===== [B4] Semaphore::up -> wakeup_task #1 =====
+#0  os::sync::semaphore::Semaphore::up (self=0x80286510 <os::mm::heap_allocator::HEAP_SPACE+17680>) at src/sync/semaphore.rs:43
+#1  0x000000008023bb26 in os::syscall::sync::sys_semaphore_up (sem_id=0) at src/syscall/sync.rs:157
+#2  0x000000008022b6b2 in os::syscall::syscall (syscall_id=468, args=...) at src/syscall/mod.rs:145
+count=0 wait_queue_len=0
+Cannot execute this command while the target is running.
+Use the "interrupt" command to stop the target
+and then try again.
+
+0x0000000000001000 in ?? ()
+
+########## Scene C: ch8b_race_adder_mutex_spin (spin mutex) ##########
+NOTE: the debug kernel traps (LoadPageFault) while GDB is attached to this
+heavy 16-thread app; the app passes without GDB (see ch8-api-impl-run.log).
+Breakpoint 1 at 0x80225910: file src/sync/mutex.rs, line 42.
+Warning: the current language does not match this frame.
+
+===== [C1] MutexSpin::lock #1 entry =====
+#0  os::sync::mutex::{impl#1}::lock (self=0x80286590 <os::mm::heap_allocator::HEAP_SPACE+17808>) at src/sync/mutex.rs:42
+#1  0x000000008023b24e in os::syscall::sync::sys_mutex_lock (mutex_id=0) at src/syscall/sync.rs:83
+#2  0x000000008022b676 in os::syscall::syscall (syscall_id=464, args=...) at src/syscall/mod.rs:142
+#3  0x0000000080241e80 in os::trap::trap_handler () at src/trap/mod.rs:73
+locked=0
+
+===== [C1] MutexSpin::lock #2 entry =====
+#0  os::sync::mutex::{impl#1}::lock (self=0x80286590 <os::mm::heap_allocator::HEAP_SPACE+17808>) at src/sync/mutex.rs:42
+#1  0x000000008023b24e in os::syscall::sync::sys_mutex_lock (mutex_id=0) at src/syscall/sync.rs:83
+#2  0x000000008022b676 in os::syscall::syscall (syscall_id=464, args=...) at src/syscall/mod.rs:142
+#3  0x0000000080241e80 in os::trap::trap_handler () at src/trap/mod.rs:73
+locked=0
+
+===== [C1] MutexSpin::lock #3 entry =====
+#0  os::sync::mutex::{impl#1}::lock (self=0x80286590 <os::mm::heap_allocator::HEAP_SPACE+17808>) at src/sync/mutex.rs:42
+#1  0x000000008023b24e in os::syscall::sync::sys_mutex_lock (mutex_id=0) at src/syscall/sync.rs:83
+#2  0x000000008022b676 in os::syscall::syscall (syscall_id=464, args=...) at src/syscall/mod.rs:142
+#3  0x0000000080241e80 in os::trap::trap_handler () at src/trap/mod.rs:73
+locked=0
+Cannot execute this command while the target is running.
+Use the "interrupt" command to stop the target
+and then try again.
+
+0x0000000000001000 in ?? ()
+
+########## Scene D: ch8b_phil_din_mutex (blocking mutex, 5 threads) ##########
+Breakpoint 1 at 0x80225d2c: file src/sync/mutex.rs, line 100.
+Breakpoint 2 at 0x80225ef6: file src/sync/mutex.rs, line 106.
+Breakpoint 3 at 0x80225f38: file src/sync/mutex.rs, line 115.
+Breakpoint 4 at 0x80226096: file src/sync/mutex.rs, line 121.
+Warning: the current language does not match this frame.
+
+===== [D1] MutexBlocking::lock #1 entry =====
+#0  os::sync::mutex::{impl#3}::lock (self=0x80286510 <os::mm::heap_allocator::HEAP_SPACE+17680>) at src/sync/mutex.rs:100
+#1  0x000000008023b24e in os::syscall::sync::sys_mutex_lock (mutex_id=1) at src/syscall/sync.rs:83
+#2  0x000000008022b676 in os::syscall::syscall (syscall_id=464, args=...) at src/syscall/mod.rs:142
+#3  0x0000000080241e80 in os::trap::trap_handler () at src/trap/mod.rs:73
+locked=0 wait_queue_len=0
+
+===== [D1] MutexBlocking::lock #2 entry =====
+#0  os::sync::mutex::{impl#3}::lock (self=0x80287690 <os::mm::heap_allocator::HEAP_SPACE+22160>) at src/sync/mutex.rs:100
+#1  0x000000008023b24e in os::syscall::sync::sys_mutex_lock (mutex_id=2) at src/syscall/sync.rs:83
+#2  0x000000008022b676 in os::syscall::syscall (syscall_id=464, args=...) at src/syscall/mod.rs:142
+#3  0x0000000080241e80 in os::trap::trap_handler () at src/trap/mod.rs:73
+locked=0 wait_queue_len=0
+
+===== [D1] MutexBlocking::lock #3 entry =====
+#0  os::sync::mutex::{impl#3}::lock (self=0x80287690 <os::mm::heap_allocator::HEAP_SPACE+22160>) at src/sync/mutex.rs:100
+#1  0x000000008023b24e in os::syscall::sync::sys_mutex_lock (mutex_id=2) at src/syscall/sync.rs:83
+#2  0x000000008022b676 in os::syscall::syscall (syscall_id=464, args=...) at src/syscall/mod.rs:142
+#3  0x0000000080241e80 in os::trap::trap_handler () at src/trap/mod.rs:73
+locked=1 wait_queue_len=0
+
+===== [D2] MutexBlocking::lock -> block #1 =====
+#0  os::sync::mutex::{impl#3}::lock (self=0x80287690 <os::mm::heap_allocator::HEAP_SPACE+22160>) at src/sync/mutex.rs:106
+#1  0x000000008023b24e in os::syscall::sync::sys_mutex_lock (mutex_id=2) at src/syscall/sync.rs:83
+#2  0x000000008022b676 in os::syscall::syscall (syscall_id=464, args=...) at src/syscall/mod.rs:142
+locked=1 wait_queue_len=1
+
+===== [D1] MutexBlocking::lock #4 entry =====
+#0  os::sync::mutex::{impl#3}::lock (self=0x80285990 <os::mm::heap_allocator::HEAP_SPACE+14736>) at src/sync/mutex.rs:100
+#1  0x000000008023b24e in os::syscall::sync::sys_mutex_lock (mutex_id=0) at src/syscall/sync.rs:83
+#2  0x000000008022b676 in os::syscall::syscall (syscall_id=464, args=...) at src/syscall/mod.rs:142
+#3  0x0000000080241e80 in os::trap::trap_handler () at src/trap/mod.rs:73
+locked=0 wait_queue_len=0
+
+===== [D2] MutexBlocking::lock -> block #2 =====
+#0  os::sync::mutex::{impl#3}::lock (self=0x80286510 <os::mm::heap_allocator::HEAP_SPACE+17680>) at src/sync/mutex.rs:106
+#1  0x000000008023b24e in os::syscall::sync::sys_mutex_lock (mutex_id=1) at src/syscall/sync.rs:83
+#2  0x000000008022b676 in os::syscall::syscall (syscall_id=464, args=...) at src/syscall/mod.rs:142
+locked=1 wait_queue_len=1
+
+===== [D2] MutexBlocking::lock -> block #3 =====
+#0  os::sync::mutex::{impl#3}::lock (self=0x80285990 <os::mm::heap_allocator::HEAP_SPACE+14736>) at src/sync/mutex.rs:106
+#1  0x000000008023b24e in os::syscall::sync::sys_mutex_lock (mutex_id=0) at src/syscall/sync.rs:83
+#2  0x000000008022b676 in os::syscall::syscall (syscall_id=464, args=...) at src/syscall/mod.rs:142
+locked=1 wait_queue_len=1
+
+===== [D3] MutexBlocking::unlock #1 entry =====
+#0  os::sync::mutex::{impl#3}::unlock (self=0x80287690 <os::mm::heap_allocator::HEAP_SPACE+22160>) at src/sync/mutex.rs:115
+#1  0x000000008023b354 in os::syscall::sync::sys_mutex_unlock (mutex_id=2) at src/syscall/sync.rs:104
+#2  0x000000008022b68a in os::syscall::syscall (syscall_id=466, args=...) at src/syscall/mod.rs:143
+#3  0x0000000080241e80 in os::trap::trap_handler () at src/trap/mod.rs:73
+locked=1 wait_queue_len=1
+
+===== [D4] MutexBlocking::unlock -> wakeup_task #1 =====
+#0  os::sync::mutex::{impl#3}::unlock (self=0x80287690 <os::mm::heap_allocator::HEAP_SPACE+22160>) at src/sync/mutex.rs:121
+#1  0x000000008023b354 in os::syscall::sync::sys_mutex_unlock (mutex_id=2) at src/syscall/sync.rs:104
+#2  0x000000008022b68a in os::syscall::syscall (syscall_id=466, args=...) at src/syscall/mod.rs:143
+locked=1 wait_queue_len=0
+
+===== [D3] MutexBlocking::unlock #2 entry =====
+#0  os::sync::mutex::{impl#3}::unlock (self=0x80286510 <os::mm::heap_allocator::HEAP_SPACE+17680>) at src/sync/mutex.rs:115
+#1  0x000000008023b354 in os::syscall::sync::sys_mutex_unlock (mutex_id=1) at src/syscall/sync.rs:104
+#2  0x000000008022b68a in os::syscall::syscall (syscall_id=466, args=...) at src/syscall/mod.rs:143
+#3  0x0000000080241e80 in os::trap::trap_handler () at src/trap/mod.rs:73
+locked=1 wait_queue_len=1
+
+===== [D4] MutexBlocking::unlock -> wakeup_task #2 =====
+#0  os::sync::mutex::{impl#3}::unlock (self=0x80286510 <os::mm::heap_allocator::HEAP_SPACE+17680>) at src/sync/mutex.rs:121
+#1  0x000000008023b354 in os::syscall::sync::sys_mutex_unlock (mutex_id=1) at src/syscall/sync.rs:104
+#2  0x000000008022b68a in os::syscall::syscall (syscall_id=466, args=...) at src/syscall/mod.rs:143
+locked=1 wait_queue_len=0
+
+===== [D3] MutexBlocking::unlock #3 entry =====
+#0  os::sync::mutex::{impl#3}::unlock (self=0x80288610 <os::mm::heap_allocator::HEAP_SPACE+26128>) at src/sync/mutex.rs:115
+#1  0x000000008023b354 in os::syscall::sync::sys_mutex_unlock (mutex_id=4) at src/syscall/sync.rs:104
+#2  0x000000008022b68a in os::syscall::syscall (syscall_id=466, args=...) at src/syscall/mod.rs:143
+#3  0x0000000080241e80 in os::trap::trap_handler () at src/trap/mod.rs:73
+locked=1 wait_queue_len=0
+
+===== [D3] MutexBlocking::unlock #4 entry =====
+#0  os::sync::mutex::{impl#3}::unlock (self=0x80287e10 <os::mm::heap_allocator::HEAP_SPACE+24080>) at src/sync/mutex.rs:115
+#1  0x000000008023b354 in os::syscall::sync::sys_mutex_unlock (mutex_id=3) at src/syscall/sync.rs:104
+#2  0x000000008022b68a in os::syscall::syscall (syscall_id=466, args=...) at src/syscall/mod.rs:143
+#3  0x0000000080241e80 in os::trap::trap_handler () at src/trap/mod.rs:73
+locked=1 wait_queue_len=1
+
+===== [D4] MutexBlocking::unlock -> wakeup_task #3 =====
+#0  os::sync::mutex::{impl#3}::unlock (self=0x80287e10 <os::mm::heap_allocator::HEAP_SPACE+24080>) at src/sync/mutex.rs:121
+#1  0x000000008023b354 in os::syscall::sync::sys_mutex_unlock (mutex_id=3) at src/syscall/sync.rs:104
+#2  0x000000008022b68a in os::syscall::syscall (syscall_id=466, args=...) at src/syscall/mod.rs:143
+locked=1 wait_queue_len=0
+Cannot execute this command while the target is running.
+Use the "interrupt" command to stop the target
+and then try again.
