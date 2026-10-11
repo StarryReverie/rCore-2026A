@@ -100,7 +100,23 @@ pub fn sys_close(fd: usize) -> isize {
 /// Invalid user pointers and allocation-failure rollback are outside the input
 /// contract. No new address-translation or descriptor-management API is needed.
 pub fn sys_pipe(pipe: *mut usize) -> isize {
-    todo!("syscall::sys_pipe")
+    trace!("kernel:pid[{}] sys_pipe", current_task().unwrap().pid.0);
+    let task = current_task().unwrap();
+    let token = current_user_token();
+    let mut inner = task.inner_exclusive_access();
+    let (pipe_read, pipe_write) = make_pipe();
+    // Occupy the read slot before allocating the write descriptor so the two
+    // descriptors are always distinct.
+    let read_fd = inner.alloc_fd();
+    inner.fd_table[read_fd] = Some(pipe_read);
+    let write_fd = inner.alloc_fd();
+    inner.fd_table[write_fd] = Some(pipe_write);
+    // Translate each result slot independently; the two usize values may map to
+    // non-contiguous physical pages.
+    *translated_refmut(token, pipe) = read_fd;
+    let write_ptr = (pipe as usize + size_of::<usize>()) as *mut usize;
+    *translated_refmut(token, write_ptr) = write_fd;
+    0
 }
 
 /// Duplicate a descriptor into the smallest free slot (syscall 24).
@@ -111,7 +127,19 @@ pub fn sys_pipe(pipe: *mut usize) -> isize {
 /// share offsets for ordinary files and extend endpoint lifetimes for pipes.
 /// The original descriptor and all other occupied slots remain unchanged.
 pub fn sys_dup(fd: usize) -> isize {
-    todo!("syscall::sys_dup")
+    trace!("kernel:pid[{}] sys_dup", current_task().unwrap().pid.0);
+    let task = current_task().unwrap();
+    let mut inner = task.inner_exclusive_access();
+    if fd >= inner.fd_table.len() {
+        return -1;
+    }
+    if inner.fd_table[fd].is_none() {
+        return -1;
+    }
+    let file = inner.fd_table[fd].as_ref().unwrap().clone();
+    let new_fd = inner.alloc_fd();
+    inner.fd_table[new_fd] = Some(file);
+    new_fd as isize
 }
 
 /// Get an open file's metadata and copy it into the caller's address space.

@@ -85,7 +85,12 @@ impl PipeRingBuffer {
     /// Advance the tail with wraparound and update Normal/Full status without
     /// changing the head, unread data, or the registered write endpoint.
     pub fn write_byte(&mut self, byte: u8) {
-        todo!("fs::PipeRingBuffer::write_byte")
+        self.status = RingBufferStatus::Normal;
+        self.arr[self.tail] = byte;
+        self.tail = (self.tail + 1) % RING_BUFFER_SIZE;
+        if self.tail == self.head {
+            self.status = RingBufferStatus::Full;
+        }
     }
 
     /// Remove and return the oldest unread byte.
@@ -94,20 +99,32 @@ impl PipeRingBuffer {
     /// Advance the head with wraparound and update Normal/Empty status without
     /// changing the tail or the remaining unread bytes.
     pub fn read_byte(&mut self) -> u8 {
-        todo!("fs::PipeRingBuffer::read_byte")
+        self.status = RingBufferStatus::Normal;
+        let byte = self.arr[self.head];
+        self.head = (self.head + 1) % RING_BUFFER_SIZE;
+        if self.head == self.tail {
+            self.status = RingBufferStatus::Empty;
+        }
+        byte
     }
 
     /// Return the unread byte count in 0..=RING_BUFFER_SIZE without mutation.
     /// Empty means zero and Full means the entire capacity; Normal must account
     /// for both contiguous and wrapped contents.
     pub fn available_read(&self) -> usize {
-        todo!("fs::PipeRingBuffer::available_read")
+        match self.status {
+            RingBufferStatus::Empty => 0,
+            RingBufferStatus::Full => RING_BUFFER_SIZE,
+            RingBufferStatus::Normal => {
+                (self.tail + RING_BUFFER_SIZE - self.head) % RING_BUFFER_SIZE
+            }
+        }
     }
 
     /// Return the free byte count without mutation. Together with
     /// available_read(), the result must sum to RING_BUFFER_SIZE.
     pub fn available_write(&self) -> usize {
-        todo!("fs::PipeRingBuffer::available_write")
+        RING_BUFFER_SIZE - self.available_read()
     }
 
     /// The write endpoint must have been registered by make_pipe(). Its Weak
@@ -125,7 +142,11 @@ impl PipeRingBuffer {
 /// with set_write_end() before returning. The buffer must not own a strong
 /// reference to its write endpoint. This function does not allocate descriptors.
 pub fn make_pipe() -> (Arc<Pipe>, Arc<Pipe>) {
-    todo!("fs::make_pipe")
+    let buffer = Arc::new(unsafe { UPSafeCell::new(PipeRingBuffer::new()) });
+    let read_end = Arc::new(Pipe::read_end_with_buffer(buffer.clone()));
+    let write_end = Arc::new(Pipe::write_end_with_buffer(buffer.clone()));
+    buffer.exclusive_access().set_write_end(&write_end);
+    (read_end, write_end)
 }
 
 impl File for Pipe {
@@ -148,7 +169,40 @@ impl File for Pipe {
     /// suspend_current_and_run_next(), and recheck on resumption. Do not consume
     /// more bytes than requested, translate addresses again, or allocate an fd.
     fn read(&self, buf: UserBuffer) -> usize {
-        todo!("fs::Pipe::read")
+        assert!(self.readable());
+        let want_to_read = buf.len();
+        if want_to_read == 0 {
+            return 0;
+        }
+        let mut buf_iter = buf.into_iter();
+        let mut already_read = 0usize;
+        loop {
+            let mut ring_buffer = self.buffer.exclusive_access();
+            let loop_read = ring_buffer.available_read();
+            if loop_read == 0 {
+                if ring_buffer.all_write_ends_closed() {
+                    return already_read;
+                }
+                // Release the borrow before yielding; another process may
+                // access the same buffer while this one is suspended.
+                drop(ring_buffer);
+                suspend_current_and_run_next();
+                continue;
+            }
+            for _ in 0..loop_read {
+                if let Some(byte_ref) = buf_iter.next() {
+                    unsafe {
+                        *byte_ref = ring_buffer.read_byte();
+                    }
+                    already_read += 1;
+                    if already_read == want_to_read {
+                        return want_to_read;
+                    }
+                } else {
+                    return already_read;
+                }
+            }
+        }
     }
 
     /// Write all bytes from the translated buffer in slice order and return its
@@ -162,6 +216,33 @@ impl File for Pipe {
     /// making room. Tracking closed read endpoints or raising EPIPE/SIGPIPE is
     /// not required by this interface.
     fn write(&self, buf: UserBuffer) -> usize {
-        todo!("fs::Pipe::write")
+        assert!(self.writable());
+        let want_to_write = buf.len();
+        if want_to_write == 0 {
+            return 0;
+        }
+        let mut buf_iter = buf.into_iter();
+        let mut already_write = 0usize;
+        loop {
+            let mut ring_buffer = self.buffer.exclusive_access();
+            let loop_write = ring_buffer.available_write();
+            if loop_write == 0 {
+                // Release the borrow before yielding so the reader can make room.
+                drop(ring_buffer);
+                suspend_current_and_run_next();
+                continue;
+            }
+            for _ in 0..loop_write {
+                if let Some(byte_ref) = buf_iter.next() {
+                    ring_buffer.write_byte(unsafe { *byte_ref });
+                    already_write += 1;
+                    if already_write == want_to_write {
+                        return want_to_write;
+                    }
+                } else {
+                    return already_write;
+                }
+            }
+        }
     }
 }
