@@ -1,0 +1,159 @@
+0x0000000000001000 in ?? ()
+
+########## Scene A: ch7b_pipetest + shell dup ##########
+Temporary breakpoint 1 at 0x80202d64: file src/syscall/fs.rs, line 85.
+
+Temporary breakpoint 1, os::syscall::fs::sys_pipe (pipe=0xded8) at src/syscall/fs.rs:85
+85	    trace!("kernel:pid[{}] sys_pipe", current_task().unwrap().pid.0);
+Warning: the current language does not match this frame.
+
+===== [A1] sys_pipe entry (ch7b_pipetest) =====
+#0  os::syscall::fs::sys_pipe (pipe=0xded8) at src/syscall/fs.rs:85
+#1  0x0000000080226144 in os::syscall::syscall (syscall_id=59, args=...) at src/syscall/mod.rs:78
+#2  0x0000000080234314 in os::trap::trap_handler () at src/trap/mod.rs:73
+#3  0x00000000000001ee in ?? ()
+Temporary breakpoint 2 at 0x80230362: file src/fs/pipe.rs, line 104.
+
+Temporary breakpoint 2, os::fs::pipe::make_pipe () at src/fs/pipe.rs:104
+104	    let buffer = Arc::new(unsafe { UPSafeCell::new(PipeRingBuffer::new()) });
+
+===== [A2] make_pipe =====
+#0  os::fs::pipe::make_pipe () at src/fs/pipe.rs:104
+#1  0x0000000080202dea in os::syscall::fs::sys_pipe (pipe=0xded8) at src/syscall/fs.rs:89
+#2  0x0000000080226144 in os::syscall::syscall (syscall_id=59, args=...) at src/syscall/mod.rs:78
+Temporary breakpoint 3 at 0x8023000c: file src/fs/pipe.rs, line 62.
+
+Temporary breakpoint 3, os::fs::pipe::PipeRingBuffer::set_write_end (self=0x82273b98 <os::mm::heap_allocator::HEAP_SPACE+33553304>, write_end=0xfffffffffffdc5b0) at src/fs/pipe.rs:62
+62	        self.write_end = Some(Arc::downgrade(write_end));
+
+===== [A3] PipeRingBuffer::set_write_end (register Weak) =====
+#0  os::fs::pipe::PipeRingBuffer::set_write_end (self=0x82273b98 <os::mm::heap_allocator::HEAP_SPACE+33553304>, write_end=0xfffffffffffdc5b0) at src/fs/pipe.rs:62
+#1  0x000000008023042e in os::fs::pipe::make_pipe () at src/fs/pipe.rs:107
+#2  0x0000000080202dea in os::syscall::fs::sys_pipe (pipe=0xded8) at src/syscall/fs.rs:89
+$1 = alloc::sync::Arc<os::fs::pipe::Pipe, alloc::alloc::Global> {ptr: core::ptr::non_null::NonNull<alloc::sync::ArcInner<os::fs::pipe::Pipe>> {pointer: 0x80276520 <os::mm::heap_allocator::HEAP_SPACE+9504>}, phantom: core::marker::PhantomData<alloc::sync::ArcInner<os::fs::pipe::Pipe>>, alloc: alloc::alloc::Global}
+Breakpoint 4 at 0x80230058: file src/fs/pipe.rs, line 65.
+Breakpoint 5 at 0x802300fc: file src/fs/pipe.rs, line 73.
+Breakpoint 6 at 0x802302e8: file src/fs/pipe.rs, line 98.
+Temporary breakpoint 7 at 0x8020307c: file src/syscall/fs.rs, line 100.
+
+===== [A6] all_write_ends_closed #1 =====
+#0  os::fs::pipe::PipeRingBuffer::all_write_ends_closed (self=0x82273b98 <os::mm::heap_allocator::HEAP_SPACE+33553304>) at src/fs/pipe.rs:98
+#1  0x000000008023056e in os::fs::pipe::{impl#2}::read (self=0x80276510 <os::mm::heap_allocator::HEAP_SPACE+9488>, buf=...) at src/fs/pipe.rs:127
+#2  0x00000000802026b6 in os::syscall::fs::sys_read (fd=3, buf=0xdee8 <error: Cannot access memory at address 0xdee8>, len=32) at src/syscall/fs.rs:49
+#3  0x0000000080226186 in os::syscall::syscall (syscall_id=63, args=...) at src/syscall/mod.rs:81
+
+===== [A6] all_write_ends_closed #2 =====
+#0  os::fs::pipe::PipeRingBuffer::all_write_ends_closed (self=0x82273b98 <os::mm::heap_allocator::HEAP_SPACE+33553304>) at src/fs/pipe.rs:98
+#1  0x000000008023056e in os::fs::pipe::{impl#2}::read (self=0x80276510 <os::mm::heap_allocator::HEAP_SPACE+9488>, buf=...) at src/fs/pipe.rs:127
+#2  0x00000000802026b6 in os::syscall::fs::sys_read (fd=3, buf=0xdee8 <error: Cannot access memory at address 0xdee8>, len=32) at src/syscall/fs.rs:49
+#3  0x0000000080226186 in os::syscall::syscall (syscall_id=63, args=...) at src/syscall/mod.rs:81
+
+===== [A6] all_write_ends_closed #3 =====
+#0  os::fs::pipe::PipeRingBuffer::all_write_ends_closed (self=0x82273b98 <os::mm::heap_allocator::HEAP_SPACE+33553304>) at src/fs/pipe.rs:98
+#1  0x000000008023056e in os::fs::pipe::{impl#2}::read (self=0x80276510 <os::mm::heap_allocator::HEAP_SPACE+9488>, buf=...) at src/fs/pipe.rs:127
+#2  0x00000000802026b6 in os::syscall::fs::sys_read (fd=3, buf=0xdee8 <error: Cannot access memory at address 0xdee8>, len=32) at src/syscall/fs.rs:49
+#3  0x0000000080226186 in os::syscall::syscall (syscall_id=63, args=...) at src/syscall/mod.rs:81
+
+===== [A4] write_byte #1 byte=72 =====
+#0  os::fs::pipe::PipeRingBuffer::write_byte (self=0x82273b98 <os::mm::heap_allocator::HEAP_SPACE+33553304>, byte=72 'H') at src/fs/pipe.rs:65
+#1  0x0000000080230810 in os::fs::pipe::{impl#2}::write (self=0x80276530 <os::mm::heap_allocator::HEAP_SPACE+9520>, buf=...) at src/fs/pipe.rs:165
+#2  0x0000000080202314 in os::syscall::fs::sys_write (fd=4, buf=0x4320 <error: Cannot access memory at address 0x4320>, len=13) at src/syscall/fs.rs:27
+head=0 tail=0 status=1
+
+===== [A4] write_byte #2 byte=101 =====
+#0  os::fs::pipe::PipeRingBuffer::write_byte (self=0x82273b98 <os::mm::heap_allocator::HEAP_SPACE+33553304>, byte=101 'e') at src/fs/pipe.rs:65
+#1  0x0000000080230810 in os::fs::pipe::{impl#2}::write (self=0x80276530 <os::mm::heap_allocator::HEAP_SPACE+9520>, buf=...) at src/fs/pipe.rs:165
+#2  0x0000000080202314 in os::syscall::fs::sys_write (fd=4, buf=0x4320 <error: Cannot access memory at address 0x4320>, len=13) at src/syscall/fs.rs:27
+head=0 tail=1 status=2
+
+===== [A4] write_byte #13 byte=33 =====
+#0  os::fs::pipe::PipeRingBuffer::write_byte (self=0x82273b98 <os::mm::heap_allocator::HEAP_SPACE+33553304>, byte=33 '!') at src/fs/pipe.rs:65
+#1  0x0000000080230810 in os::fs::pipe::{impl#2}::write (self=0x80276530 <os::mm::heap_allocator::HEAP_SPACE+9520>, buf=...) at src/fs/pipe.rs:165
+#2  0x0000000080202314 in os::syscall::fs::sys_write (fd=4, buf=0x4320 <error: Cannot access memory at address 0x4320>, len=13) at src/syscall/fs.rs:27
+head=0 tail=12 status=2
+
+===== [A5] read_byte #1 =====
+#0  os::fs::pipe::PipeRingBuffer::read_byte (self=0x82273b98 <os::mm::heap_allocator::HEAP_SPACE+33553304>) at src/fs/pipe.rs:73
+#1  0x000000008023064c in os::fs::pipe::{impl#2}::read (self=0x80276510 <os::mm::heap_allocator::HEAP_SPACE+9488>, buf=...) at src/fs/pipe.rs:137
+#2  0x00000000802026b6 in os::syscall::fs::sys_read (fd=3, buf=0xdee8 <error: Cannot access memory at address 0xdee8>, len=32) at src/syscall/fs.rs:49
+head=0 tail=13 status=2
+
+===== [A5] read_byte #2 =====
+#0  os::fs::pipe::PipeRingBuffer::read_byte (self=0x82273b98 <os::mm::heap_allocator::HEAP_SPACE+33553304>) at src/fs/pipe.rs:73
+#1  0x000000008023064c in os::fs::pipe::{impl#2}::read (self=0x80276510 <os::mm::heap_allocator::HEAP_SPACE+9488>, buf=...) at src/fs/pipe.rs:137
+#2  0x00000000802026b6 in os::syscall::fs::sys_read (fd=3, buf=0xdee8 <error: Cannot access memory at address 0xdee8>, len=32) at src/syscall/fs.rs:49
+head=1 tail=13 status=2
+
+===== [A5] read_byte #13 =====
+#0  os::fs::pipe::PipeRingBuffer::read_byte (self=0x82273b98 <os::mm::heap_allocator::HEAP_SPACE+33553304>) at src/fs/pipe.rs:73
+#1  0x000000008023064c in os::fs::pipe::{impl#2}::read (self=0x80276510 <os::mm::heap_allocator::HEAP_SPACE+9488>, buf=...) at src/fs/pipe.rs:137
+#2  0x00000000802026b6 in os::syscall::fs::sys_read (fd=3, buf=0xdee8 <error: Cannot access memory at address 0xdee8>, len=32) at src/syscall/fs.rs:49
+head=12 tail=13 status=2
+
+===== [A6] all_write_ends_closed #4 =====
+#0  os::fs::pipe::PipeRingBuffer::all_write_ends_closed (self=0x82273b98 <os::mm::heap_allocator::HEAP_SPACE+33553304>) at src/fs/pipe.rs:98
+#1  0x000000008023056e in os::fs::pipe::{impl#2}::read (self=0x80276510 <os::mm::heap_allocator::HEAP_SPACE+9488>, buf=...) at src/fs/pipe.rs:127
+#2  0x00000000802026b6 in os::syscall::fs::sys_read (fd=3, buf=0xdee8 <error: Cannot access memory at address 0xdee8>, len=32) at src/syscall/fs.rs:49
+#3  0x0000000080226186 in os::syscall::syscall (syscall_id=63, args=...) at src/syscall/mod.rs:81
+
+===== [A6] all_write_ends_closed #5 =====
+#0  os::fs::pipe::PipeRingBuffer::all_write_ends_closed (self=0x82273b98 <os::mm::heap_allocator::HEAP_SPACE+33553304>) at src/fs/pipe.rs:98
+#1  0x000000008023056e in os::fs::pipe::{impl#2}::read (self=0x80276510 <os::mm::heap_allocator::HEAP_SPACE+9488>, buf=...) at src/fs/pipe.rs:127
+#2  0x00000000802026b6 in os::syscall::fs::sys_read (fd=3, buf=0xdee8 <error: Cannot access memory at address 0xdee8>, len=32) at src/syscall/fs.rs:49
+#3  0x0000000080226186 in os::syscall::syscall (syscall_id=63, args=...) at src/syscall/mod.rs:81
+
+Temporary breakpoint 7, os::syscall::fs::sys_dup (fd=3) at src/syscall/fs.rs:100
+100	    trace!("kernel:pid[{}] sys_dup", current_task().unwrap().pid.0);
+
+===== [A7] sys_dup (shell redirection) =====
+#0  os::syscall::fs::sys_dup (fd=3) at src/syscall/fs.rs:100
+#1  0x0000000080226106 in os::syscall::syscall (syscall_id=24, args=...) at src/syscall/mod.rs:75
+#2  0x0000000080234314 in os::trap::trap_handler () at src/trap/mod.rs:73
+#3  0x0000000000000b30 in ?? ()
+$2 = 3
+Cannot execute this command while the target is running.
+Use the "interrupt" command to stop the target
+and then try again.
+0x0000000000001000 in ?? ()
+
+########## Scene B: ch7b_pipe_large_test (3000-byte transfer) ##########
+Breakpoint 1 at 0x802306b0: file src/fs/pipe.rs, line 150.
+Breakpoint 2 at 0x802304ae: file src/fs/pipe.rs, line 119.
+Breakpoint 3 at 0x80230058: file src/fs/pipe.rs, line 65.
+Warning: the current language does not match this frame.
+
+===== [B2] Pipe::read entry =====
+#0  os::fs::pipe::{impl#2}::read (self=0x822700d0 <os::mm::heap_allocator::HEAP_SPACE+33538256>, buf=...) at src/fs/pipe.rs:119
+#1  0x00000000802026b6 in os::syscall::fs::sys_read (fd=3, buf=0xc300 <error: Cannot access memory at address 0xc300>, len=3000) at src/syscall/fs.rs:49
+#2  0x0000000080226186 in os::syscall::syscall (syscall_id=63, args=...) at src/syscall/mod.rs:81
+
+===== [B1] Pipe::write entry =====
+#0  os::fs::pipe::{impl#2}::write (self=0x822700f0 <os::mm::heap_allocator::HEAP_SPACE+33538288>, buf=...) at src/fs/pipe.rs:150
+#1  0x0000000080202314 in os::syscall::fs::sys_write (fd=4, buf=0xc300 <error: Cannot access memory at address 0xc300>, len=3000) at src/syscall/fs.rs:27
+#2  0x000000008022619e in os::syscall::syscall (syscall_id=64, args=...) at src/syscall/mod.rs:82
+
+===== [B3] write_byte #1 =====
+#0  os::fs::pipe::PipeRingBuffer::write_byte (self=0x82273b98 <os::mm::heap_allocator::HEAP_SPACE+33553304>, byte=2 '\002') at src/fs/pipe.rs:65
+#1  0x0000000080230810 in os::fs::pipe::{impl#2}::write (self=0x822700f0 <os::mm::heap_allocator::HEAP_SPACE+33538288>, buf=...) at src/fs/pipe.rs:165
+#2  0x0000000080202314 in os::syscall::fs::sys_write (fd=4, buf=0xc300 <error: Cannot access memory at address 0xc300>, len=3000) at src/syscall/fs.rs:27
+head=0 tail=0 status=1
+
+===== [B3] write_byte #2 =====
+#0  os::fs::pipe::PipeRingBuffer::write_byte (self=0x82273b98 <os::mm::heap_allocator::HEAP_SPACE+33553304>, byte=2 '\002') at src/fs/pipe.rs:65
+#1  0x0000000080230810 in os::fs::pipe::{impl#2}::write (self=0x822700f0 <os::mm::heap_allocator::HEAP_SPACE+33538288>, buf=...) at src/fs/pipe.rs:165
+#2  0x0000000080202314 in os::syscall::fs::sys_write (fd=4, buf=0xc300 <error: Cannot access memory at address 0xc300>, len=3000) at src/syscall/fs.rs:27
+head=0 tail=1 status=2
+
+===== [B3] write_byte #33 =====
+#0  os::fs::pipe::PipeRingBuffer::write_byte (self=0x82273b98 <os::mm::heap_allocator::HEAP_SPACE+33553304>, byte=2 '\002') at src/fs/pipe.rs:65
+#1  0x0000000080230810 in os::fs::pipe::{impl#2}::write (self=0x822700f0 <os::mm::heap_allocator::HEAP_SPACE+33538288>, buf=...) at src/fs/pipe.rs:165
+#2  0x0000000080202314 in os::syscall::fs::sys_write (fd=4, buf=0xc300 <error: Cannot access memory at address 0xc300>, len=3000) at src/syscall/fs.rs:27
+head=0 tail=0 status=1
+
+===== [B3] write_byte #65 =====
+#0  os::fs::pipe::PipeRingBuffer::write_byte (self=0x82273b98 <os::mm::heap_allocator::HEAP_SPACE+33553304>, byte=2 '\002') at src/fs/pipe.rs:65
+#1  0x0000000080230810 in os::fs::pipe::{impl#2}::write (self=0x822700f0 <os::mm::heap_allocator::HEAP_SPACE+33538288>, buf=...) at src/fs/pipe.rs:165
+#2  0x0000000080202314 in os::syscall::fs::sys_write (fd=4, buf=0xc300 <error: Cannot access memory at address 0xc300>, len=3000) at src/syscall/fs.rs:27
+head=0 tail=0 status=1
+
+----- observed 3 full 32-byte batches (96 bytes), ending Scene B -----
