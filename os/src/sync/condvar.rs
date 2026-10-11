@@ -41,7 +41,10 @@ impl Condvar {
     /// An empty queue is a no-op; do not save a notification or transfer mutex
     /// ownership. The awakened task must acquire its mutex itself.
     pub fn signal(&self) {
-        todo!("sync::Condvar::signal")
+        let mut inner = self.inner.exclusive_access();
+        if let Some(task) = inner.wait_queue.pop_front() {
+            wakeup_task(task);
+        }
     }
 
     /// Wait for a notification, returning with the supplied mutex held again.
@@ -52,6 +55,11 @@ impl Condvar {
     /// remains responsible for checking its condition in a loop.
     pub fn wait(&self, mutex: Arc<dyn Mutex>) {
         trace!("kernel: Condvar::wait_with_mutex");
-        todo!("sync::Condvar::wait")
+        mutex.unlock();
+        let mut inner = self.inner.exclusive_access();
+        inner.wait_queue.push_back(current_task().unwrap());
+        drop(inner);
+        block_current_and_run_next();
+        mutex.lock();
     }
 }
